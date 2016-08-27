@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<title>YSW AdSense</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+	href="../../css/bootstrap.min.css" />
+<link rel="stylesheet" th:href="@{/css/style.css}"
+	href="../../css/style.css" />
+</head>
+<body>
+	<div class="container">
+		<div th:include="layout::header"></div>
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div th:include="layout::nav"></div>
+			</div>
+			<div class="col-sm-9">
+				<ol class="breadcrumb">
+					<li><a href="/">Home</a></li>
+					<li class="active"><a href="#">Events Management</a></li>
+				</ol>
+
+				<div style="padding-bottom: 15px;">
+					<a th:href="@{/event/create}" class="btn btn-default"> Add </a>
+				</div>
+
+				<table
+					class="table table-striped table-bordered table-hover table-condensed">
+					<thead>
+						<tr>
+							<th>Event name</th>
+							<th>Description</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="event : ${events}">
+							<td><a th:href="@{/event(id=${event.id})}"
+								th:text="${event.name}"></a></td>
+							<td th:text="${event.description}"></td>
+							<td th:text="${event.toString()}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

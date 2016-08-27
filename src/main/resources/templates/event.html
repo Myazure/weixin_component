@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<title>YSW AdSense</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+	href="../../css/bootstrap.min.css" />
+<link rel="stylesheet" th:href="@{/css/style.css}"
+	href="../../css/style.css" />
+</head>
+<body>
+	<div class="container">
+		<div th:include="layout::header"></div>
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div th:include="layout::nav"></div>
+			</div>
+			<div class="col-sm-9">
+				<ol class="breadcrumb">
+					<li><a href="/">Home</a></li>
+					<li><a href="/events">Events Management</a></li>
+					<li class="active"><a href="#">Event details</a></li>
+				</ol>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="control-label col-lg-3">Event Name:</label> <label
+								class="control-label" th:text="${event.name}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Description:</label> <label
+								class="control-label" th:text="${event.description}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Event Type:</label> <label
+								class="control-label" th:text="${event.eventType}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Frequency:</label> <label
+								class="control-label" th:text="${event.frequency}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Event Date:</label> <label
+								class="control-label" th:text="${event.startDate}"></label> - <label
+								class="control-label" th:text="${event.endDate}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Event Time:</label> <label
+								class="control-label" th:text="${event.startHour}"></label> - <label
+								class="control-label" th:text="${event.endHour}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Safe Distance:</label>
+							<label class="control-label" th:text="${event.safeDistance}"> M</label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Require Subscribed:</label>
+							<label class="control-label" th:text="${event.requireSubscribed}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">QR Type:</label> <label
+								class="control-label" th:text="${event.qrType}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Active:</label> <label
+								class="control-label" th:text="${event.active}"></label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Official Account: </label>
+							<div class="media">
+								<div class="media-left">
+									<img class="media-object" style="width: 64px; height: 64px;"
+										th:src="@{${event.officialAccount.headImgUrl}}" />
+								</div>
+								<div class="media-body">
+									<label class="control-label"
+										th:text="${event.officialAccount.nickName}"></label> <br /> <label
+										class="control-label" th:text="${event.officialAccount.appId}"></label>
+									<br /> <label class="control-label"
+										th:text="${event.officialAccount.userName}"></label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Goods Name:</label> <label
+								class="control-label" th:text="${event.goods.name}"></label> - <label
+								class="control-label" th:text="${event.goods.yswGoodsId}">
+							</label>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-3">Choosed Mats:</label>
+							<div class="media">
+								<div class="media-body">
+									<table
+										class="table table-striped table-bordered table-hover table-condensed">
+										<thead>
+											<tr>
+												<th>ID</th>
+												<th>Details</th>
+												<th>QR</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="matMat : ${eventMats}">
+												<td th:text="@{${matMat.mat.id}}"></td>
+												<td><label class="control-label"
+													th:text="@{${matMat.mat.matCode}}"></label> - <label
+													class="control-label" th:text="@{${matMat.mat.matIp}}"></label>
+													- <label class="control-label"
+													th:text="@{${matMat.mat.city}}"></label> - <label
+													class="control-label"
+													th:text="@{${matMat.mat.description}}"></label> - <label
+													class="control-label" th:text="@{${matMat.mat.locationX}}"></label>
+													- <label class="control-label"
+													th:text="@{${matMat.mat.locationY}}"></label> <br /> <label
+													class="control-label">Show Time: </label> <label
+													class="control-label" th:text="@{${matMat.startHour}}"></label>
+													- <label class="control-label"
+													th:text="@{${matMat.endHour}}"></label> <br /> <label
+													class="control-label">Active: </label><label
+													class="control-label" th:text="@{${matMat.active}}"></label>
+												</td>
+												<td><img
+													th:src="@{/genqr(eventid=${matMat.event.id}, matid=${matMat.mat.id})}"
+													style="width: 120px; height: 120px;" /></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

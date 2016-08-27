@@ -1,0 +1,42 @@
+
+
+<div th:fragment="header">
+	<div class="row">
+		<div class="col-xs-12">
+			<h1 class="pull-left">YSW Adsense</h1>
+			<div class="pull-right">
+				<form th:action="@{/logout}" method="post">
+					<button type="submit" class="btn btn-link">Sign Out</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:fragment="nav">
+	<div class="sidebar-nav">
+		<div class="navbar navbar-default" role="navigation">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".sidebar-navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<span class="visible-xs navbar-brand">Sidebar menu</span>
+			</div>
+			<div class="navbar-collapse collapse sidebar-navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a th:href="@{/}" href="home.html"> <i
+							class="fa fa-fw fa-wrench"></i> Home
+					</a></li>
+					<li sec:authorize="hasAuthority('ADMIN')"><a
+						th:href="@{/events}" href="events.html"> Event Management </a></li>
+					<li sec:authorize="hasAuthority('ADMIN')"><a
+						th:href="@{/users}" href="users.html"> User Management </a></li>
+				</ul>
+			</div>
+			<!--/.nav-collapse -->
+		</div>
+	</div>
+</div>

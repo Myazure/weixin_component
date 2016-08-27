@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Notification!!!</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+	href="../../css/bootstrap.min.css" />
+<link rel="stylesheet" th:href="@{/css/style.css}"
+	href="../../css/style.css" />
+</head>
+<body>
+	<div class="container">
+		<div class="content">
+			<h1 th:if="${message}" th:text="${message}" class="alert"></h1>
+		</div>
+	</div>
+</body>
+</html>
