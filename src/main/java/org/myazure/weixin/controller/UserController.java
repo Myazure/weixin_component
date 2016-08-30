@@ -8,7 +8,7 @@ import javax.validation.Valid;
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.entity.MaUserEntity;
 import org.myazure.weixin.domain.validator.AdUserFormValidator;
-import org.myazure.weixin.service.AdUserService;
+import org.myazure.weixin.service.MaUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,11 @@ import org.springframework.web.servlet.ModelAndView;
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-    private final AdUserService userService;
+    private final MaUserService userService;
     private final AdUserFormValidator userCreateFormValidator;
     
     @Autowired
-    public UserController(AdUserService userService, AdUserFormValidator userCreateFormValidator) {
+    public UserController(MaUserService userService, AdUserFormValidator userCreateFormValidator) {
         this.userService = userService;
         this.userCreateFormValidator = userCreateFormValidator;
     }
@@ -91,7 +91,6 @@ public class UserController {
             bindingResult.rejectValue("userName", "userName", "name already exists");
             return "user_create";
         }
-        // ok, redirect
         return "redirect:/users";
     }
 

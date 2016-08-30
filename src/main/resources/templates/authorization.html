@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
-<title>Authorization Info-YSW AdSense</title>
+<title>Authorization Info-Myazyre Weixin</title>
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
 	href="../../css/bootstrap.min.css" />
 <link rel="stylesheet" th:href="@{/css/style.css}"
@@ -22,7 +22,7 @@
 					pl. waiting for 10 mins!</p>
 
 				<div sec:authorize="hasAuthority('ADMIN')">
-					<h1>欢迎访问YSW Adsense!</h1>
+					<h1>Welcome Myazyre Weixin!</h1>
 				</div>
 				<div sec:authorize="hasAuthority('USER')">
 					<p>

@@ -2,7 +2,7 @@ package org.myazure.weixin.service.currentUser;
 
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.CurrentUser;
-import org.myazure.weixin.service.AdUserService;
+import org.myazure.weixin.service.MaUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CurrentUserDetailsService implements UserDetailsService {
 
-    private final AdUserService userService;
+    private final MaUserService userService;
 
     @Autowired
-    public CurrentUserDetailsService(AdUserService userService) {
+    public CurrentUserDetailsService(MaUserService userService) {
         this.userService = userService;
     }
 

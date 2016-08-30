@@ -1,7 +1,7 @@
 package org.myazure.weixin.domain.validator;
 
 import org.myazure.weixin.domain.entity.MaUserEntity;
-import org.myazure.weixin.service.AdUserService;
+import org.myazure.weixin.service.MaUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,10 +13,10 @@ import org.springframework.validation.Validator;
 @Component
 public class AdUserFormValidator implements Validator {
 
-    private final AdUserService userService;
+    private final MaUserService userService;
 
     @Autowired
-    public AdUserFormValidator(AdUserService userService) {
+    public AdUserFormValidator(MaUserService userService) {
         this.userService = userService;
     }
 

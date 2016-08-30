@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class AdUserServiceImpl implements AdUserService {
+public class MaUserServiceImpl implements MaUserService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdUserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MaUserServiceImpl.class);
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -25,7 +25,7 @@ public class AdUserServiceImpl implements AdUserService {
     private final MaUserRepository userRepository;
 
     @Autowired
-    public AdUserServiceImpl(MaUserRepository userRepository) {
+    public MaUserServiceImpl(MaUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

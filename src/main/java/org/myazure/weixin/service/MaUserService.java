@@ -6,7 +6,7 @@ import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.entity.MaUserEntity;
 
 
-public interface AdUserService {
+public interface MaUserService {
 
     MaUser getAdUserById(long id);
 

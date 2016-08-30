@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
-<title>YSW AdSense</title>
+<title>Myazyre Weixin</title>
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
 	href="../../css/bootstrap.min.css" />
 <link rel="stylesheet" th:href="@{/css/style.css}"
@@ -22,11 +22,11 @@
 					pl. waiting for 10 mins!</p>
 
 				<div sec:authorize="hasAuthority('ADMIN')">
-					<h1>欢迎访问YSW Adsense!</h1>
+					<h1>Welcome to Myazure Weixin Component!</h1>
 				</div>
 				<div sec:authorize="hasAuthority('USER')">
 					<p>
-						点击去给药尚网第三方平台授权, <a th:href="@{/authorize}">授权</a>
+						Click to authorize, <a th:href="@{/authorize}">授权</a>
 					</p>
 					<div>
 						<table

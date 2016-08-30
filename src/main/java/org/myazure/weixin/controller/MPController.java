@@ -3,29 +3,17 @@ package org.myazure.weixin.controller;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Base64;
 import org.myazure.weixin.configuration.AppUrlService;
 import org.myazure.weixin.constant.MyazureConstants;
-import org.myazure.weixin.domain.MaOfficialAccount;
-import org.myazure.weixin.domain.MaOfficialAccountWxUser;
 import org.myazure.weixin.domain.MaUser;
-import org.myazure.weixin.domain.MaWxUser;
 import org.myazure.weixin.domain.CurrentUser;
-import org.myazure.weixin.service.AdUserService;
-import org.myazure.weixin.service.AdsenseAPI;
-import org.myazure.weixin.service.BASE;
-import org.myazure.weixin.utils.LocationUtils;
+import org.myazure.weixin.service.MaUserService;
+import org.myazure.weixin.service.MyazureWeixinAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,18 +25,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import weixin.popular.api.MessageAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult.Authorizer_info;
 import weixin.popular.bean.component.ApiQueryAuthResult;
 import weixin.popular.bean.component.ApiQueryAuthResult.Authorization_info;
 import weixin.popular.bean.component.ComponentReceiveXML;
-import weixin.popular.bean.component.FuncInfo;
 import weixin.popular.bean.message.EventMessage;
-import weixin.popular.bean.message.message.TextMessage;
-import weixin.popular.bean.user.User;
 
-import com.alibaba.fastjson.JSON;
 import com.qq.weixin.mp.aes.AesException;
 
 /**
@@ -64,11 +47,11 @@ public class MPController {
 	private AppUrlService urlService;
 
 	@Autowired
-	private AdUserService userService;
+	private MaUserService userService;
 
 
 	@Autowired
-	private AdsenseAPI adsenseAPI;
+	private MyazureWeixinAPI myazureWeixinAPI;
 
 	@Autowired
 	private StringRedisTemplate redisTemplate;
@@ -88,7 +71,7 @@ public class MPController {
 	 */
 	@RequestMapping(path = "/event/authorize", method = RequestMethod.POST)
 	public void acceptAuthorizeEvent(HttpServletRequest request, HttpServletResponse response) throws IOException, AesException {
-		ComponentReceiveXML eventMessage = adsenseAPI.getEventMessage(request, response, ComponentReceiveXML.class);
+		ComponentReceiveXML eventMessage = myazureWeixinAPI.getEventMessage(request, response, ComponentReceiveXML.class);
 		if (eventMessage == null) {
 			outputStreamWrite(response.getOutputStream(), "success");
 			return;
@@ -98,7 +81,7 @@ public class MPController {
 		LOG.debug(eventMessage.getInfoType());
 		switch (eventMessage.getInfoType()) {
 		case "component_verify_ticket":
-			adsenseAPI.refresh(eventMessage.getComponentVerifyTicket());
+			myazureWeixinAPI.refreshVerifyTicket(eventMessage);
 			break;
 		case "unauthorized":
 			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
@@ -135,9 +118,9 @@ public class MPController {
 			@RequestParam(value = "auth_code", required = true) String authCode, @RequestParam(value = "expires_in", required = true) Long expires) {
 		Long userId = currentUser.getId();
 		MaUser user = userService.getAdUserById(userId);
-		ApiQueryAuthResult authInfoRes = adsenseAPI.getAuthInfo(authCode);
+		ApiQueryAuthResult authInfoRes = myazureWeixinAPI.getAuthInfo(authCode);
 		Authorization_info authInfo = authInfoRes.getAuthorization_info();
-		ApiGetAuthorizerInfoResult userInfo = adsenseAPI.getAuthUserInfo(authInfo.getAuthorizer_appid());
+		ApiGetAuthorizerInfoResult userInfo = myazureWeixinAPI.getAuthUserInfo(authInfo.getAuthorizer_appid());
 		Authorizer_info oaAccount = userInfo.getAuthorizer_info();
 		return "redirect:/";
 	}
@@ -159,7 +142,7 @@ public class MPController {
 	@RequestMapping(path = "/callback/{appId}/callback", method = RequestMethod.POST)
 	public void acceptMessageAndEvent(@PathVariable("appId") String appId, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// get event message info
-		EventMessage eventMessage = adsenseAPI.getEventMessage(request, response, EventMessage.class);
+		EventMessage eventMessage = myazureWeixinAPI.getEventMessage(request, response, EventMessage.class);
 		// response
 		// Event Message is null
 		return;

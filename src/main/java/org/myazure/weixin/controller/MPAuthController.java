@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.myazure.weixin.configuration.AppUrlService;
 import org.myazure.weixin.domain.CurrentUser;
-import org.myazure.weixin.service.AdsenseAPI;
+import org.myazure.weixin.service.MyazureWeixinAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,13 @@ public class MPAuthController {
     private AppUrlService urlService;
 
     @Autowired
-    private AdsenseAPI adsenseAPI;
+    private MyazureWeixinAPI myazureWeixinAPI;
     
     //授权体验页面
     @RequestMapping("/test")
     public ModelAndView test(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("test");
-    	String link = adsenseAPI.componentLoginPage(urlService.getAppUrl() + "/callback/authorize");
+    	String link = myazureWeixinAPI.componentLoginPage(urlService.getAppUrl() + "/callback/authorize");
         modelAndView.addObject("link",link);
         return modelAndView;
     }
@@ -42,11 +42,11 @@ public class MPAuthController {
     @RequestMapping(value = "/authorize")
     public void goAuthor(@ModelAttribute("currentUser") CurrentUser currentUser,
                          HttpServletRequest request, HttpServletResponse response) throws IOException {
-    	if(null == adsenseAPI.getPreAuthCodeStr()) {
+    	if(null == myazureWeixinAPI.getPreAuthCodeStr()) {
         	response.sendRedirect(urlService.getAppUrl() + "/?error='preauthcode'");
         	return;
     	}
-    	String link = adsenseAPI.componentLoginPage(urlService.getAppUrl() + "/callback/authorize");
+    	String link = myazureWeixinAPI.componentLoginPage(urlService.getAppUrl() + "/callback/authorize");
     	response.sendRedirect(link);
     }
 }

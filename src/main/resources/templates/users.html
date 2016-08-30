@@ -39,7 +39,7 @@
 						<tr th:each="user : ${users}">
 							<td><a th:href="@{/user(id=${user.id})}"
 								th:text="${user.userName}"></a></td>
-							<td th:text="${user}"></td>
+							<td th:text="${user.role}"></td>
 						</tr>
 					</tbody>
 				</table>

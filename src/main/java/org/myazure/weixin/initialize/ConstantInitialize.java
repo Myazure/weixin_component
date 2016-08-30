@@ -4,6 +4,7 @@ import org.myazure.weixin.constant.MyazureConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import weixin.popular.api.API;
 import weixin.popular.client.LocalHttpClient;
@@ -11,7 +12,7 @@ import weixin.popular.support.TokenManager;
 
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
-
+@Component("constantInitialize")
 public class ConstantInitialize {
 	private static final Logger LOG = LoggerFactory.getLogger(ConstantInitialize.class);
 	@Value("${weixin.compAppId}")

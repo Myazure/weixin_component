@@ -25,9 +25,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.myazure.weixin.constant.MyazureConstants;
 import org.myazure.weixin.constant.WeixinConstans;
-import org.myazure.weixin.domain.MaOfficialAccount;
-import org.myazure.weixin.domain.MaWxUser;
-import org.myazure.weixin.initialize.ConstantInitialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,18 +34,17 @@ import org.springframework.stereotype.Service;
 import weixin.popular.api.ComponentAPI;
 import weixin.popular.api.QrcodeAPI;
 import weixin.popular.api.TicketAPI;
-import weixin.popular.api.UserAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiQueryAuthResult;
 import weixin.popular.bean.component.ApiQueryAuthResult.Authorization_info;
 import weixin.popular.bean.component.AuthorizerAccessToken;
 import weixin.popular.bean.component.ComponentAccessToken;
+import weixin.popular.bean.component.ComponentReceiveXML;
 import weixin.popular.bean.component.FuncInfo;
 import weixin.popular.bean.component.PreAuthCode;
 import weixin.popular.bean.message.EventMessage;
 import weixin.popular.bean.qrcode.QrcodeTicket;
 import weixin.popular.bean.ticket.Ticket;
-import weixin.popular.bean.user.FollowResult;
 import weixin.popular.bean.user.User;
 import weixin.popular.client.LocalHttpClient;
 import weixin.popular.util.EmojiUtil;
@@ -56,23 +52,18 @@ import weixin.popular.util.SignatureUtil;
 import weixin.popular.util.StreamUtils;
 import weixin.popular.util.XMLConverUtil;
 
-import com.alibaba.fastjson.JSON;
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 
 @Service
-public class AdsenseAPI {
+public class MyazureWeixinAPI {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AdsenseAPI.class);
-
-	
+	private static final Logger LOG = LoggerFactory.getLogger(MyazureWeixinAPI.class);
 
 	protected static Header jsonHeader = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
 
 	@Autowired
 	private StringRedisTemplate redisTemplate;
-
-	@Autowired
 
 	/**
 	 * 获取公众号第三方平台access_token<br />
@@ -88,8 +79,8 @@ public class AdsenseAPI {
 			StringBuilder sb = new StringBuilder();
 			// TODO
 			// Remove this at version of weixin-popular over 2.8
-			sb.append("https://mp.weixin.qq.com" + "/cgi-bin/componentloginpage?").append("component_appid=").append(MyazureConstants.MYAZURE_APP_ID).append("&pre_auth_code=")
-					.append(this.getPreAuthCodeStr()).append("&redirect_uri=").append(URLEncoder.encode(calbackurl, "utf-8"));
+			sb.append("https://mp.weixin.qq.com" + "/cgi-bin/componentloginpage?").append("component_appid=").append(MyazureConstants.MYAZURE_APP_ID)
+					.append("&pre_auth_code=").append(this.getPreAuthCodeStr()).append("&redirect_uri=").append(URLEncoder.encode(calbackurl, "utf-8"));
 			return sb.toString();
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -111,7 +102,8 @@ public class AdsenseAPI {
 		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
 			LOG.info("[Myazure Weixin]: Get >>>Component Access Token<<< from WX.");
-			ComponentAccessToken res = ComponentAPI.api_component_token(MyazureConstants.MYAZURE_APP_ID, MyazureConstants.MYAZURE_APP_SECRET, MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
+			ComponentAccessToken res = ComponentAPI.api_component_token(MyazureConstants.MYAZURE_APP_ID, MyazureConstants.MYAZURE_APP_SECRET,
+					MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
 			accessToken = res.getComponent_access_token();
 			if (null != accessToken) {
 				// Save to redis
@@ -138,9 +130,8 @@ public class AdsenseAPI {
 		return preAuthCode;
 	}
 
-
 	public String getAuthorizerRefreshTokenStr(String authorizer_appid) {
-		String key = AdsenseAPI.genAuthorizerRefreshTokenKey(authorizer_appid);
+		String key = MyazureWeixinAPI.genAuthorizerRefreshTokenKey(authorizer_appid);
 		// Fetch from redis first
 		LOG.info("[Myazure Weixin]: Get >>>Authorizer Refresh Token<<< from redis.");
 		String authorizerRefreshToken = redisTemplate.opsForValue().get(key);
@@ -154,7 +145,6 @@ public class AdsenseAPI {
 		}
 		return authorizerRefreshToken;
 	}
-
 
 	/**
 	 * 使用授权码换取公众号的授权信息<br />
@@ -172,10 +162,10 @@ public class AdsenseAPI {
 			Authorization_info authInfo = auth.getAuthorization_info();
 			if (null != authInfo) {
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Access Token<<< to redis.");
-				String key = AdsenseAPI.genAuthorizerAccessTokenKey(authInfo.getAuthorizer_appid());
+				String key = MyazureWeixinAPI.genAuthorizerAccessTokenKey(authInfo.getAuthorizer_appid());
 				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Refresh Token<<< to redis.");
-				key = AdsenseAPI.genAuthorizerRefreshTokenKey(authInfo.getAuthorizer_appid());
+				key = MyazureWeixinAPI.genAuthorizerRefreshTokenKey(authInfo.getAuthorizer_appid());
 				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
 			}
 		}
@@ -474,6 +464,10 @@ public class AdsenseAPI {
 			return null;
 		}
 		if (isAes) {
+			if (signature==null) {
+				LOG.error("The request signature is invalid");
+				return null;
+			}
 			if (!signature.equals(SignatureUtil.generateEventMessageSignature(encodeToken, timestamp, nonce))) {
 				LOG.error("The request signature is invalid");
 				return null;
@@ -535,21 +529,23 @@ public class AdsenseAPI {
 	 * 
 	 * @param componentVerifyTicket
 	 */
-	public void refresh(String componentVerifyTicket) {
+	public void refreshVerifyTicket(ComponentReceiveXML eventMessage) {
 		// Update component verify ticket in memory
-		MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET = componentVerifyTicket;
+		MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET = eventMessage.getComponentVerifyTicket();
 		// Refresh component access token
-		LOG.info("[Myazure Weixin]: Refresh component access token from redis.");
-
+		LOG.info("[YSW Adsense]: Refresh component access token from redis.");
 		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
 			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = this.getComponentAccessTokenStr();
 		} else if (redisTemplate.getExpire(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY) < 1000) {
 			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = this.getComponentAccessTokenStr();
 		}
-		LOG.debug("[Myazure Weixin]: COMPONENT VIRFY TIKET NOW = {}", MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
-		LOG.debug("[Myazure Weixin]: YSW COMPONENT ACCESS TOKEN NOW = {}", MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN);
-		LOG.debug("[Myazure Weixin]: COMPONENT VIRFY TIKET TIME= {}", redisTemplate.getExpire(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY));
+		if(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN==null){
+			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
+		}
+		LOG.debug("[Myazure Adsense]: COMPONENT VIRFY TIKET NOW = {}", MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
+		LOG.debug("[Myazure Adsense]: Myazure COMPONENT ACCESS TOKEN NOW = {}", MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN);
+		LOG.debug("[Myazure Adsense]: COMPONENT ACCESS TOKEN TIME= {}", redisTemplate.getExpire(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY));
 	}
 
 	/**
@@ -572,7 +568,6 @@ public class AdsenseAPI {
 		return WeixinConstans.AUTHORIZER_REFRESH_TOKEN_KEY + "[" + authorizerAppId + "]:";
 	}
 
-
 	/**
 	 * 获取授权者权限集是否满足
 	 * 
@@ -581,7 +576,8 @@ public class AdsenseAPI {
 	 * @return
 	 */
 	private boolean checkFuncInfo(String appidString, int func) {
-		ApiGetAuthorizerInfoResult req = ComponentAPI.api_get_authorizer_info(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID, appidString);
+		ApiGetAuthorizerInfoResult req = ComponentAPI.api_get_authorizer_info(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID,
+				appidString);
 		if (appidString == null | appidString == "") {
 			LOG.debug("appidString == null||||||||| ");
 			return false;

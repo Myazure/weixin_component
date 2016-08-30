@@ -32,11 +32,6 @@ public class MyazureWeiXin {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(MyazureWeiXin.class);
 
-	/*
-	 * @Bean public EmbeddedServletContainerCustomizer
-	 * embeddedServletCustomizer(){ return new
-	 * YswEmbeddedServletContainerCustomizer(); }
-	 */
 
 	@Bean
 	public RestTemplate restTemplate() {
