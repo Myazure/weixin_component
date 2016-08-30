@@ -32,7 +32,7 @@ public class MaOfficialAccountEntity {
 
     @Override
 	public String toString() {
-		return "AdOfficialAccountEntity [id=" + id + ", user=" + user
+		return "MaOfficialAccountEntity [id=" + id + ", user=" + user
 				+ ", appId=" + appId + ", userName=" + userName + ", nickName=" + nickName
 				+ ", headImgUrl=" + headImgUrl + ", authorized=" + authorized
 				+ ", refreshToken=" + refreshToken + "]";

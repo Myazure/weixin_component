@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.myazure.weixin.configuration.AppUrlService;
-import org.myazure.weixin.constant.AdConstants;
+import org.myazure.weixin.constant.MyazureConstants;
 import org.myazure.weixin.domain.MaOfficialAccount;
 import org.myazure.weixin.domain.MaOfficialAccountWxUser;
 import org.myazure.weixin.domain.MaUser;
@@ -52,7 +52,7 @@ import com.alibaba.fastjson.JSON;
 import com.qq.weixin.mp.aes.AesException;
 
 /**
- * @author csyangchsh@gmail.com Date: 15-12-18
+ * @author WangZhen Date: 15-12-18
  * @author WangZhen <wangzhenjjcn@gmail.com> Date 16-06-20
  */
 @Controller
@@ -94,27 +94,27 @@ public class MPController {
 			return;
 		}
 		
-		LOG.debug(BASE.LOG_SPLIT_LINE);
+		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.debug(eventMessage.getInfoType());
 		switch (eventMessage.getInfoType()) {
 		case "component_verify_ticket":
 			adsenseAPI.refresh(eventMessage.getComponentVerifyTicket());
 			break;
 		case "unauthorized":
-			LOG.debug(BASE.LOG_SPLIT_LINE);
-			LOG.debug("[YSW Adsense]: unauthorized:" + eventMessage.getAppId());
+			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
+			LOG.debug("[Myazure Weixin]: unauthorized:" + eventMessage.getAppId());
 			break;
 		case "updateauthorized":
-			LOG.debug(BASE.LOG_SPLIT_LINE);
-			LOG.debug("[YSW Adsense]: updateauthorized:" + eventMessage.getAppId());
+			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
+			LOG.debug("[Myazure Weixin]: updateauthorized:" + eventMessage.getAppId());
 			break;
 		case "authorized":
-			LOG.debug(BASE.LOG_SPLIT_LINE);
-			LOG.debug("[YSW Adsense]: authorized:" + eventMessage.getAppId());
+			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
+			LOG.debug("[Myazure Weixin]: authorized:" + eventMessage.getAppId());
 			break;
 		default:
-			LOG.debug(BASE.LOG_SPLIT_LINE);
-			LOG.error("[YSW Adsense]: NOT FOUNDED ! Event Type: ", eventMessage.getInfoType());
+			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
+			LOG.error("[Myazure Weixin]: NOT FOUNDED ! Event Type: ", eventMessage.getInfoType());
 			break;
 		}
 		outputStreamWrite(response.getOutputStream(), "success");

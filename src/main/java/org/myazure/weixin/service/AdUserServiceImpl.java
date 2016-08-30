@@ -32,7 +32,7 @@ public class AdUserServiceImpl implements AdUserService {
     @Override
     @Cacheable(value = "userCache",keyGenerator = "wiselyKeyGenerator")
     public MaUser getAdUserById(long id) {
-    	LOGGER.info("[YSW Adsense]: getAdUserById()");
+    	LOGGER.info("[Myazure Weixin]: getAdUserById()");
         return userRepository.findOne(id);
     }
 
@@ -44,7 +44,7 @@ public class AdUserServiceImpl implements AdUserService {
     @Override
     @Cacheable(value = "userCache",keyGenerator = "wiselyKeyGenerator")
     public Collection<MaUser> getAllAdUsers() {
-    	LOGGER.info("[YSW Adsense]: getAllAdUsers()");
+    	LOGGER.info("[Myazure Weixin]: getAllAdUsers()");
         return (Collection<MaUser>) userRepository.findAll(new Sort("userName"));
     }
 

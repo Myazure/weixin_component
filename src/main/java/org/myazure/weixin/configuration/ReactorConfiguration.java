@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import reactor.spring.context.config.EnableReactor;
 
 /**
- * @author csyangchsh@gmail.com
+ * @author WangZhen
  */
 @Configuration
 @EnableReactor

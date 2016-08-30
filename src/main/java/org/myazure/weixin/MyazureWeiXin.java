@@ -1,7 +1,7 @@
 package org.myazure.weixin;
 
 import org.myazure.weixin.configuration.AppUrlService;
-import org.myazure.weixin.configuration.YswEmbeddedServletContainerCustomizer;
+import org.myazure.weixin.configuration.MyazureEmbeddedServletContainerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -27,10 +27,10 @@ import org.springframework.web.client.RestTemplate;
 @EnableJpaAuditing
 @SpringBootApplication
 // @EnableCaching
-public class AdsenseApplication {
+public class MyazureWeiXin {
 
 	@SuppressWarnings("unused")
-	private static final Logger LOG = LoggerFactory.getLogger(AdsenseApplication.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MyazureWeiXin.class);
 
 	/*
 	 * @Bean public EmbeddedServletContainerCustomizer
@@ -61,6 +61,6 @@ public class AdsenseApplication {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(AdsenseApplication.class, args);
+		SpringApplication.run(MyazureWeiXin.class, args);
 	}
 }

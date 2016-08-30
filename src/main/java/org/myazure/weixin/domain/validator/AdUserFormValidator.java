@@ -8,7 +8,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * @author csyangchsh@gmail.com
+ * @author WangZhen
  */
 @Component
 public class AdUserFormValidator implements Validator {

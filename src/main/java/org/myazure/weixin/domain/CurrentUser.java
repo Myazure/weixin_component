@@ -4,7 +4,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 
 
 /**
- * @author csyangchsh@gmail.com
+ * @author WangZhen
  */
 public class CurrentUser extends org.springframework.security.core.userdetails.User {
 

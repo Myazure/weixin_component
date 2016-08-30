@@ -1,13 +1,15 @@
 package org.myazure.weixin.repository;
-
 import java.util.List;
 
 import org.myazure.weixin.domain.MaOfficialAccount;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public interface MaOfficialAccountRepository extends PagingAndSortingRepository<MaOfficialAccount, Long> {
 
     List<MaOfficialAccount> findByAppId(String appId);

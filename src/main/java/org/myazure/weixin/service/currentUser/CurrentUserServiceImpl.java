@@ -4,7 +4,7 @@ import org.myazure.weixin.domain.MaRole;
 import org.myazure.weixin.domain.CurrentUser;
 
 /**
- * @author csyangchsh@gmail.com
+ * @author WangZhen
  */
 public class CurrentUserServiceImpl implements CurrentUserService {
 

@@ -10,7 +10,7 @@ import javax.persistence.MappedSuperclass;
 import java.util.Date;
 
 /**
- * @author csyangchsh@gmail.com
+ * @author WangZhen
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

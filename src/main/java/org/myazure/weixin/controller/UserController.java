@@ -44,7 +44,7 @@ public class UserController {
 
     @RequestMapping("/users")
     public ModelAndView getUsersPage() {
-        LOGGER.debug("[YSW Adsense]: Getting users page");
+        LOGGER.debug("[Myazure Weixin]: Getting users page");
         List<MaUser> users = (List<MaUser>) userService.getAllAdUsers();
         return new ModelAndView("users", "users", users);
     }
@@ -52,7 +52,7 @@ public class UserController {
     @PreAuthorize("@currentUserServiceImpl.canAccessUser(principal, #id)")
     @RequestMapping("/user")
     public ModelAndView getUserPage(@RequestParam(value = "id") Long id) {
-        LOGGER.debug("[YSW Adsense]: Getting user page for user={}", id);
+        LOGGER.debug("[Myazure Weixin]: Getting user page for user={}", id);
         MaUser user = userService.getAdUserById(id);
         if(user == null) {
             throw new NoSuchElementException(String.format("User=%s not found", id));
@@ -63,7 +63,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/user/create", method = RequestMethod.GET)
     public ModelAndView getUserCreatePage(@RequestParam(value = "id", required = false) Long id) {
-        LOGGER.debug("[YSW Adsense]: Getting user create form");
+        LOGGER.debug("[Myazure Weixin]: Getting user create form");
         MaUserEntity form = new MaUserEntity();
         if(null != id) {
             MaUser user = userService.getAdUserById(id);
@@ -79,7 +79,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
     public String handleUserCreateForm(@Valid @ModelAttribute("form") MaUserEntity form, BindingResult bindingResult) {
-        LOGGER.debug("[YSW Adsense]: Processing user create form={}, bindingResult={}", form, bindingResult);
+        LOGGER.debug("[Myazure Weixin]: Processing user create form={}, bindingResult={}", form, bindingResult);
         if (bindingResult.hasErrors()) {
             // failed validation
             return "user_create";
@@ -87,7 +87,7 @@ public class UserController {
         try {
             userService.create(form);
         } catch (DataIntegrityViolationException e) {
-            LOGGER.warn("[YSW Adsense]: Exception occurred when trying to save the user, assuming duplicate user name", e);
+            LOGGER.warn("[Myazure Weixin]: Exception occurred when trying to save the user, assuming duplicate user name", e);
             bindingResult.rejectValue("userName", "userName", "name already exists");
             return "user_create";
         }

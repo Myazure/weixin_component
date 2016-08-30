@@ -30,14 +30,14 @@ public class EventController {
 //
 //    @RequestMapping("/events")
 //    public ModelAndView getEventsPage() {
-//        LOGGER.debug("[YSW Adsense]: Getting events page");
+//        LOGGER.debug("[Myazure Weixin]: Getting events page");
 //        return new ModelAndView("events", "events", eventService.fetchAdEventList());
 //    }
 //
 //    @PreAuthorize("hasAuthority('ADMIN')")
 //    @RequestMapping("/event")
 //    public ModelAndView getUserPage(@RequestParam(value = "id") Long id) {
-//        LOGGER.debug("[YSW Adsense]: Getting event page for event={}", id);
+//        LOGGER.debug("[Myazure Weixin]: Getting event page for event={}", id);
 //        AdEvent event = eventService.fetchAdEventById(id);
 //        if(event == null) {
 //            throw new NoSuchElementException(String.format("User=%s not found", id));
@@ -53,7 +53,7 @@ public class EventController {
 //    @PreAuthorize("hasAuthority('ADMIN')")
 //    @RequestMapping(value = "/event/create", method = RequestMethod.GET)
 //    public ModelAndView getEventCreatePage(@RequestParam(value = "id", required = false) Long id) {
-//        LOGGER.debug("[YSW Adsense]: Getting event create form");
+//        LOGGER.debug("[Myazure Weixin]: Getting event create form");
 //        AdUserEntity form = new AdUserEntity();
 //        if(null != id) {
 //        	AdEvent event = eventService.fetchAdEventById(id);
@@ -69,7 +69,7 @@ public class EventController {
 //    @PreAuthorize("hasAuthority('ADMIN')")
 //    @RequestMapping(value = "/event/create", method = RequestMethod.POST)
 //    public String handleUserCreateForm(@Valid @ModelAttribute("form") AdUserEntity form, BindingResult bindingResult) {
-//        LOGGER.debug("[YSW Adsense]: Processing event create form={}, bindingResult={}", form, bindingResult);
+//        LOGGER.debug("[Myazure Weixin]: Processing event create form={}, bindingResult={}", form, bindingResult);
 //        if (bindingResult.hasErrors()) {
 //            // failed validation
 //            return "user_create";
@@ -91,7 +91,7 @@ public class EventController {
 //    		@RequestParam(value = "eventid") Long eventId, 
 //    		@RequestParam(value = "matid") int matId,
 //    		HttpServletResponse response) throws IOException {
-//        LOGGER.debug("[YSW Adsense]: Gen QR for mat = {}", matId);
+//        LOGGER.debug("[Myazure Weixin]: Gen QR for mat = {}", matId);
 //		AdMat mat = eventService.findMatByMatId(matId);
 //		AdEvent event = eventService.fetchAdEventById(eventId);
 //		String authorizerAppId = event.getOfficialAccount().getAppId();
