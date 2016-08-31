@@ -1,4 +1,4 @@
-package org.myazure.weixin.service;
+package org.myazure.weixin;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -96,10 +96,10 @@ public class MyazureWeixinAPI {
 	 * 
 	 * @return 公众号第三方平台access_token
 	 */
-	public String getComponentAccessTokenStr() {
+	public static String getComponentAccessTokenStr() {
 		// Fetch from redis first
 		LOG.info("[Myazure Weixin]: Get >>>Component Access Token<<< from redis.");
-		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
+		String accessToken = MyazureConstants.redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
 			LOG.info("[Myazure Weixin]: Get >>>Component Access Token<<< from WX.");
 			ComponentAccessToken res = ComponentAPI.api_component_token(MyazureConstants.MYAZURE_APP_ID, MyazureConstants.MYAZURE_APP_SECRET,
@@ -107,7 +107,7 @@ public class MyazureWeixinAPI {
 			accessToken = res.getComponent_access_token();
 			if (null != accessToken) {
 				// Save to redis
-				redisTemplate.opsForValue().set(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY, accessToken, res.getExpires_in() - 60, TimeUnit.SECONDS);
+				MyazureConstants.redisTemplate.opsForValue().set(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY, accessToken, res.getExpires_in() - 60, TimeUnit.SECONDS);
 			}
 		}
 		return accessToken;
@@ -155,18 +155,18 @@ public class MyazureWeixinAPI {
 	 *            授权code,会在授权成功时返回给第三方平台，详见第三方平台授权流程说明
 	 * @return 公众号的授权信息
 	 */
-	public ApiQueryAuthResult getAuthInfo(String authorizationCode) {
-		ApiQueryAuthResult auth = ComponentAPI.api_query_auth(this.getComponentAccessTokenStr(), MyazureConstants.MYAZURE_APP_ID, authorizationCode);
+	public static ApiQueryAuthResult getAuthInfo(String authorizationCode) {
+		ApiQueryAuthResult auth = ComponentAPI.api_query_auth(getComponentAccessTokenStr(), MyazureConstants.MYAZURE_APP_ID, authorizationCode);
 		// Store authorizer access token to redis
 		if (null != auth) {
 			Authorization_info authInfo = auth.getAuthorization_info();
 			if (null != authInfo) {
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Access Token<<< to redis.");
 				String key = MyazureWeixinAPI.genAuthorizerAccessTokenKey(authInfo.getAuthorizer_appid());
-				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
+				MyazureConstants.redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Refresh Token<<< to redis.");
 				key = MyazureWeixinAPI.genAuthorizerRefreshTokenKey(authInfo.getAuthorizer_appid());
-				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
+				MyazureConstants.redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
 			}
 		}
 		return auth;
@@ -230,36 +230,7 @@ public class MyazureWeixinAPI {
 		return ComponentAPI.api_authorizer_token(getComponentAccessTokenStr(), MyazureConstants.MYAZURE_APP_ID, authorizer_appid, authorizer_refresh_token);
 	}
 
-	/**
-	 * 创建 二维码
-	 * 
-	 * @param access_token
-	 *            access_token
-	 * @param expire_seconds
-	 *            最大不超过604800秒（即30天）
-	 * @param scene_id
-	 *            场景值ID，32位非0整型 最多10万个
-	 * @return QrcodeTicket
-	 */
-	public QrcodeTicket qrcodeCreate(String JSONData, int expire_seconds, int scene_id) {
-		if (expire_seconds > 0) {
-			return QrcodeAPI.qrcodeCreateTemp(getMyazureAccessToken(), expire_seconds, scene_id);
-		} else {
-			return QrcodeAPI.qrcodeCreateFinal(getMyazureAccessToken(), scene_id);
-		}
-	}
-
-	/**
-	 * 下载二维码
-	 * 
-	 * @param ticket
-	 *            内部自动 UrlEncode
-	 * @return BufferedImage
-	 */
-	public BufferedImage downloadQrcodeImage(String ticket) {
-		return QrcodeAPI.showqrcode(ticket);
-	}
-
+	
 	/**
 	 * 获取 jsapi_ticket
 	 * 
@@ -533,7 +504,7 @@ public class MyazureWeixinAPI {
 		// Update component verify ticket in memory
 		MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET = eventMessage.getComponentVerifyTicket();
 		// Refresh component access token
-		LOG.info("[YSW Adsense]: Refresh component access token from redis.");
+		LOG.info("[Myazure Weixin]: Refresh component access token from redis.");
 		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
 			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = this.getComponentAccessTokenStr();
@@ -543,9 +514,9 @@ public class MyazureWeixinAPI {
 		if(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN==null){
 			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		}
-		LOG.debug("[Myazure Adsense]: COMPONENT VIRFY TIKET NOW = {}", MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
-		LOG.debug("[Myazure Adsense]: Myazure COMPONENT ACCESS TOKEN NOW = {}", MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN);
-		LOG.debug("[Myazure Adsense]: COMPONENT ACCESS TOKEN TIME= {}", redisTemplate.getExpire(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY));
+		LOG.debug("[Myazure Weixin]: COMPONENT VIRFY TIKET NOW = {}", MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
+		LOG.debug("[Myazure Weixin]: Myazure COMPONENT ACCESS TOKEN NOW = {}", MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN);
+		LOG.debug("[Myazure Weixin]: COMPONENT ACCESS TOKEN TIME= {}", redisTemplate.getExpire(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY));
 	}
 
 	/**
