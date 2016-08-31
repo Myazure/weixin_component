@@ -1,5 +1,8 @@
 package org.myazure.weixin.constant;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 
 public class MyazureConstants {
@@ -14,4 +17,7 @@ public class MyazureConstants {
 	public static String MYAZURE_COMPONENT_ACCESS_TOKEN;
 	public static String MYAZURE_PRE_AUTH_CODE;
 	public static WXBizMsgCrypt MYAZUZRE_WXBIZMSGCRYPT;
+	
+	@Autowired
+	public static StringRedisTemplate redisTemplate;
 }
