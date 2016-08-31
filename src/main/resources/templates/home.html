@@ -26,23 +26,24 @@
 				</div>
 				<div sec:authorize="hasAuthority('USER')">
 					<p>
-						Click to authorize, <a th:href="@{/authorize}">授权</a>
+						Click to authorize, <a th:href="@{/authorize}">GO WECHAT NOW</a>
 					</p>
 					<div>
+					<p><strong>Authorized Wechat IDs:</strong></p>
 						<table
 							class="table table-striped table-bordered table-hover table-condensed">
 							<thead>
 								<tr>
-									<th>公众号</th>
-									<th>AppId</th>
-									<th>RefreshToken</th>
+									<th>Wechat Name</th>
+									<th>Wechat AppId</th>
+									<th>Wechat ID</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="oa : ${oas}">
 									<td th:text="${oa.nickName}"></td>
 									<td th:text="${oa.appId}"></td>
-									<td th:text="${oa.refreshToken}"></td>
+									<td th:text="${oa.username}"></td>
 								</tr>
 							</tbody>
 						</table>
