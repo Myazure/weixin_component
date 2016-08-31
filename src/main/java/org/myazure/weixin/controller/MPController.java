@@ -8,12 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.myazure.weixin.MyazureWeixinAPI;
 import org.myazure.weixin.configuration.AppUrlService;
 import org.myazure.weixin.constant.MyazureConstants;
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.CurrentUser;
+import org.myazure.weixin.handlers.AuthorizeHandler;
 import org.myazure.weixin.service.MaUserService;
-import org.myazure.weixin.service.MyazureWeixinAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +46,8 @@ public class MPController {
 
 	@Autowired
 	private AppUrlService urlService;
-
 	@Autowired
 	private MaUserService userService;
-
-
 	@Autowired
 	private MyazureWeixinAPI myazureWeixinAPI;
 
@@ -84,20 +82,16 @@ public class MPController {
 			myazureWeixinAPI.refreshVerifyTicket(eventMessage);
 			break;
 		case "unauthorized":
-			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-			LOG.debug("[Myazure Weixin]: unauthorized:" + eventMessage.getAppId());
+			AuthorizeHandler.unauthorized(eventMessage);
 			break;
 		case "updateauthorized":
-			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-			LOG.debug("[Myazure Weixin]: updateauthorized:" + eventMessage.getAppId());
+			AuthorizeHandler.updateauthorized(eventMessage);
 			break;
 		case "authorized":
-			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-			LOG.debug("[Myazure Weixin]: authorized:" + eventMessage.getAppId());
+			AuthorizeHandler.authorized(eventMessage);
 			break;
 		default:
-			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-			LOG.error("[Myazure Weixin]: NOT FOUNDED ! Event Type: ", eventMessage.getInfoType());
+			AuthorizeHandler.unknowEvent(eventMessage);
 			break;
 		}
 		outputStreamWrite(response.getOutputStream(), "success");
@@ -116,6 +110,9 @@ public class MPController {
 	@RequestMapping(path = "/callback/authorize", method = RequestMethod.GET)
 	public String authorCallback(HttpSession session, @ModelAttribute("currentUser") CurrentUser currentUser,
 			@RequestParam(value = "auth_code", required = true) String authCode, @RequestParam(value = "expires_in", required = true) Long expires) {
+		if (currentUser==null) {
+			System.err.println("user nullllllllllll");
+		}
 		Long userId = currentUser.getId();
 		MaUser user = userService.getAdUserById(userId);
 		ApiQueryAuthResult authInfoRes = myazureWeixinAPI.getAuthInfo(authCode);
