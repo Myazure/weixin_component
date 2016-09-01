@@ -52,6 +52,7 @@ import weixin.popular.util.SignatureUtil;
 import weixin.popular.util.StreamUtils;
 import weixin.popular.util.XMLConverUtil;
 
+import com.alibaba.fastjson.JSON;
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 
@@ -63,7 +64,7 @@ public class MyazureWeixinAPI {
 	protected static Header jsonHeader = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
 
 	@Autowired
-	private StringRedisTemplate redisTemplate;
+	private   StringRedisTemplate redisTemplate;
 
 	/**
 	 * 获取公众号第三方平台access_token<br />
@@ -96,18 +97,17 @@ public class MyazureWeixinAPI {
 	 * 
 	 * @return 公众号第三方平台access_token
 	 */
-	public static String getComponentAccessTokenStr() {
+	public   String getComponentAccessTokenStr() {
 		// Fetch from redis first
 		LOG.info("[Myazure Weixin]: Get >>>Component Access Token<<< from redis.");
-		String accessToken = MyazureConstants.redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
+		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
 			LOG.info("[Myazure Weixin]: Get >>>Component Access Token<<< from WX.");
 			ComponentAccessToken res = ComponentAPI.api_component_token(MyazureConstants.MYAZURE_APP_ID, MyazureConstants.MYAZURE_APP_SECRET,
 					MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
 			accessToken = res.getComponent_access_token();
 			if (null != accessToken) {
-				// Save to redis
-				MyazureConstants.redisTemplate.opsForValue().set(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY, accessToken, res.getExpires_in() - 60, TimeUnit.SECONDS);
+				redisTemplate.opsForValue().set(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY, accessToken, res.getExpires_in() - 60, TimeUnit.SECONDS);
 			}
 		}
 		return accessToken;
@@ -155,18 +155,17 @@ public class MyazureWeixinAPI {
 	 *            授权code,会在授权成功时返回给第三方平台，详见第三方平台授权流程说明
 	 * @return 公众号的授权信息
 	 */
-	public static ApiQueryAuthResult getAuthInfo(String authorizationCode) {
-		ApiQueryAuthResult auth = ComponentAPI.api_query_auth(getComponentAccessTokenStr(), MyazureConstants.MYAZURE_APP_ID, authorizationCode);
-		// Store authorizer access token to redis
+	public   ApiQueryAuthResult getAuthInfo(String authorizationCode) {
+		ApiQueryAuthResult auth = ComponentAPI.api_query_auth(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID, authorizationCode);
 		if (null != auth) {
 			Authorization_info authInfo = auth.getAuthorization_info();
 			if (null != authInfo) {
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Access Token<<< to redis.");
 				String key = MyazureWeixinAPI.genAuthorizerAccessTokenKey(authInfo.getAuthorizer_appid());
-				MyazureConstants.redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
+				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Refresh Token<<< to redis.");
 				key = MyazureWeixinAPI.genAuthorizerRefreshTokenKey(authInfo.getAuthorizer_appid());
-				MyazureConstants.redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
+				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
 			}
 		}
 		return auth;
