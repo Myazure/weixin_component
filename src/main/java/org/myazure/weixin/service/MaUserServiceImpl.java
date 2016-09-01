@@ -31,19 +31,19 @@ public class MaUserServiceImpl implements MaUserService {
 
     @Override
     @Cacheable(value = "userCache",keyGenerator = "wiselyKeyGenerator")
-    public MaUser getAdUserById(long id) {
-    	LOGGER.info("[Myazure Weixin]: getAdUserById()");
+    public MaUser getMaUserById(long id) {
+    	LOGGER.info("[Myazure Weixin]: getMaUserById()");
         return userRepository.findOne(id);
     }
 
     @Override
-    public MaUser getAdUserByName(String name) {
+    public MaUser getMaUserByName(String name) {
         return userRepository.findOneByUserName(name);
     }
 
     @Override
     @Cacheable(value = "userCache",keyGenerator = "wiselyKeyGenerator")
-    public Collection<MaUser> getAllAdUsers() {
+    public Collection<MaUser> getAllMaUsers() {
     	LOGGER.info("[Myazure Weixin]: getAllAdUsers()");
         return (Collection<MaUser>) userRepository.findAll(new Sort("userName"));
     }
@@ -52,7 +52,7 @@ public class MaUserServiceImpl implements MaUserService {
     public MaUser create(MaUserEntity form) {
         MaUser user = new MaUser();
     	if(null != form.getId() && form.getId() > 0) {
-    		user = this.getAdUserById(form.getId());
+    		user = this.getMaUserById(form.getId());
     	}
         user.setUserName(form.getUserName());
         user.setPassword(passwordEncoder.encode(form.getPassword()));

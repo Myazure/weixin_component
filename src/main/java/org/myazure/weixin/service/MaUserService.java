@@ -8,11 +8,11 @@ import org.myazure.weixin.domain.entity.MaUserEntity;
 
 public interface MaUserService {
 
-    MaUser getAdUserById(long id);
+    MaUser getMaUserById(long id);
 
-    MaUser getAdUserByName(String name);
+    MaUser getMaUserByName(String name);
 
-    Collection<MaUser> getAllAdUsers();
+    Collection<MaUser> getAllMaUsers();
 
     MaUser create(MaUserEntity form);
 }
