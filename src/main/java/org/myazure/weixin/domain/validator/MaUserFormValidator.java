@@ -11,12 +11,12 @@ import org.springframework.validation.Validator;
  * @author WangZhen
  */
 @Component
-public class AdUserFormValidator implements Validator {
+public class MaUserFormValidator implements Validator {
 
     private final MaUserService userService;
 
     @Autowired
-    public AdUserFormValidator(MaUserService userService) {
+    public MaUserFormValidator(MaUserService userService) {
         this.userService = userService;
     }
 

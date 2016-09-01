@@ -18,8 +18,9 @@ public class MaOfficialAccountEntity {
     private String userName;
 
     private String nickName;
-
-    private String headImgUrl;
+	private String alias;
+	private String qrcodeUrl;
+	private String headImgUrl;
 
     private boolean authorized = false;
 
@@ -84,6 +85,22 @@ public class MaOfficialAccountEntity {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	public String getQrcodeUrl() {
+		return qrcodeUrl;
+	}
+
+	public void setQrcodeUrl(String qrcodeUrl) {
+		this.qrcodeUrl = qrcodeUrl;
 	}
 
 	public String getNickName() {

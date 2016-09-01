@@ -30,8 +30,14 @@ public class MaOfficialAccount extends BaseEntity {
     @Column(name  = "username")
     private String userName;
     
-    @Column(name  = "nickname")
-    private String nickName;
+    @Column(name = "alias")
+	private String alias;
+
+	@Column(name = "nickname")
+	private String nickName;
+	
+	@Column(name = "qrcode_url")
+	private String qrcodeUrl;
     
     @Column(name  = "head_img_url")
     private String headImgUrl;
@@ -92,6 +98,22 @@ public class MaOfficialAccount extends BaseEntity {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	public String getQrcodeUrl() {
+		return qrcodeUrl;
+	}
+
+	public void setQrcodeUrl(String qrcodeUrl) {
+		this.qrcodeUrl = qrcodeUrl;
 	}
 
 	public String getNickName() {
