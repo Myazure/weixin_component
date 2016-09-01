@@ -38,60 +38,59 @@
 								<tr>
 									<th>Wechat Name</th>
 									<th>Image</th>
+									<th>Operator</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="oa : ${oas}">
-									<td>
-									<label class="control-label" >WechatName</label> - <label class="control-label" th:text="${oa.nickName}"></label><br /> 
-									<label class="control-label" >WechatAppId</label> - <label class="control-label" th:text="${oa.appId}"></label><br />
-									<label class="control-label" >WechatID</label> - <label class="control-label" th:text="${oa.userName}"></label><br />
-									<label class="control-label" >WechatID</label> - <label class="control-label" th:text="${oa.alias}"></label><br />
+									<td><label class="control-label">WechatName</label> - <label
+										class="control-label" th:text="${oa.nickName}"></label><br />
+										<label class="control-label">WechatAppId</label> - <label
+										class="control-label" th:text="${oa.appId}"></label><br /> <label
+										class="control-label">WechatID</label> - <label
+										class="control-label" th:text="${oa.userName}"></label><br />
+										<label class="control-label">WechatID</label> - <label
+										class="control-label" th:text="${oa.alias}"></label><br /></td>
+									<td><img th:src="${oa.qrcodeUrl}"
+										style="width: 120px; height: 120px;" /><img
+										th:src="${oa.headImgUrl}" style="width: 120px; height: 120px;" />
 									</td>
-									<td><img th:src="${oa.headImgUrl}"
-										style="width: 120px; height: 120px;" /> 
-										 <img th:src="${oa.qrcodeUrl}"
-										style="width: 120px; height: 120px;" /></td>
+									<td></td>
 								</tr>
-
-
-
 							<tbody>
 								<tr th:each="matMat : ${eventMats}">
-												<td th:text="@{${matMat.mat.id}}"></td>
-												<td><label class="control-label"
+									<td th:text="@{${matMat.mat.id}}"></td>
+									<td><label class="control-label"
 										th:text="@{${matMat.mat.matCode}}"></label> - <label
 										class="control-label" th:text="@{${matMat.mat.matIp}}"></label>
-													- <label class="control-label"
-										th:text="@{${matMat.mat.city}}"></label> - <label
-										class="control-label" th:text="@{${matMat.mat.description}}"></label> - <label
+										- <label class="control-label" th:text="@{${matMat.mat.city}}"></label>
+										- <label class="control-label"
+										th:text="@{${matMat.mat.description}}"></label> - <label
 										class="control-label" th:text="@{${matMat.mat.locationX}}"></label>
-													- <label class="control-label"
+										- <label class="control-label"
 										th:text="@{${matMat.mat.locationY}}"></label> <br /> <label
 										class="control-label">Show Time: </label> <label
 										class="control-label" th:text="@{${matMat.startHour}}"></label>
-													- <label class="control-label"
-										th:text="@{${matMat.endHour}}"></label> <br /> <label
-										class="control-label">Active: </label><label
-										class="control-label" th:text="@{${matMat.active}}"></label>
-												</td>
-												<td><img
+										- <label class="control-label" th:text="@{${matMat.endHour}}"></label>
+										<br /> <label class="control-label">Active: </label><label
+										class="control-label" th:text="@{${matMat.active}}"></label></td>
+									<td><img
 										th:src="@{/genqr(eventid=${matMat.event.id}, matid=${matMat.mat.id})}"
 										style="width: 120px; height: 120px;" /></td>
-											</tr>
-										</tbody>
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
+								</tr>
 							</tbody>
-							
+
+
+
+
+
+
+
+
+
+
+							</tbody>
+
 						</table>
 					</div>
 				</div>
