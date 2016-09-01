@@ -11,9 +11,11 @@ import javax.servlet.http.HttpSession;
 import org.myazure.weixin.MyazureWeixinAPI;
 import org.myazure.weixin.configuration.AppUrlService;
 import org.myazure.weixin.constant.MyazureConstants;
+import org.myazure.weixin.domain.MaOfficialAccount;
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.CurrentUser;
 import org.myazure.weixin.handlers.AuthorizeHandler;
+import org.myazure.weixin.service.MaOfficialAccountService;
 import org.myazure.weixin.service.MaUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +52,12 @@ public class MPController {
 	private MaUserService userService;
 	@Autowired
 	private MyazureWeixinAPI myazureWeixinAPI;
-
+	@Autowired
+	private MaOfficialAccountService maOfficialAccountService;
 	@Autowired
 	private StringRedisTemplate redisTemplate;
+	@Autowired
+	private AuthorizeHandler authorizeHandler;
 
 	@RequestMapping(path = "/debug", method = RequestMethod.GET)
 	public String debug() {
@@ -74,7 +79,7 @@ public class MPController {
 			outputStreamWrite(response.getOutputStream(), "success");
 			return;
 		}
-		
+
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.debug(eventMessage.getInfoType());
 		switch (eventMessage.getInfoType()) {
@@ -82,16 +87,16 @@ public class MPController {
 			myazureWeixinAPI.refreshVerifyTicket(eventMessage);
 			break;
 		case "unauthorized":
-			AuthorizeHandler.unauthorized(eventMessage);
+			authorizeHandler.unauthorized(eventMessage);
 			break;
 		case "updateauthorized":
-			AuthorizeHandler.updateauthorized(eventMessage);
+			authorizeHandler.updateauthorized(eventMessage);
 			break;
 		case "authorized":
-			AuthorizeHandler.authorized(eventMessage);
+			authorizeHandler.authorized(eventMessage);
 			break;
 		default:
-			AuthorizeHandler.unknowEvent(eventMessage);
+			authorizeHandler.unknowEvent(eventMessage);
 			break;
 		}
 		outputStreamWrite(response.getOutputStream(), "success");
@@ -110,15 +115,24 @@ public class MPController {
 	@RequestMapping(path = "/callback/authorize", method = RequestMethod.GET)
 	public String authorCallback(HttpSession session, @ModelAttribute("currentUser") CurrentUser currentUser,
 			@RequestParam(value = "auth_code", required = true) String authCode, @RequestParam(value = "expires_in", required = true) Long expires) {
-		if (currentUser==null) {
-			System.err.println("user nullllllllllll");
-		}
 		Long userId = currentUser.getId();
 		MaUser user = userService.getAdUserById(userId);
 		ApiQueryAuthResult authInfoRes = myazureWeixinAPI.getAuthInfo(authCode);
 		Authorization_info authInfo = authInfoRes.getAuthorization_info();
 		ApiGetAuthorizerInfoResult userInfo = myazureWeixinAPI.getAuthUserInfo(authInfo.getAuthorizer_appid());
 		Authorizer_info oaAccount = userInfo.getAuthorizer_info();
+		MaOfficialAccount oaUpdate = maOfficialAccountService.findByAppId(authInfo.getAuthorizer_appid());
+		if (oaUpdate == null) {
+			oaUpdate = new MaOfficialAccount();
+			oaUpdate.setAppId(authInfoRes.getAuthorization_info().getAuthorizer_appid());
+		}
+		oaUpdate.setAuthorized(authInfoRes.isSuccess());
+		oaUpdate.setHeadImgUrl(oaAccount.getHead_img());
+		oaUpdate.setNickName(oaAccount.getNick_name());
+		oaUpdate.setRefreshToken(authInfo.getAuthorizer_refresh_token());
+		oaUpdate.setUser(user);
+		oaUpdate.setUserName(oaAccount.getUser_name());
+		maOfficialAccountService.updateAdOfficialAccount(oaUpdate);
 		return "redirect:/";
 	}
 
@@ -144,7 +158,6 @@ public class MPController {
 		// Event Message is null
 		return;
 	}
-
 
 	private boolean outputStreamWrite(OutputStream outputStream, String text) {
 		try {
