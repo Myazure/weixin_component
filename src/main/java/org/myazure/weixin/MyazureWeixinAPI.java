@@ -16,13 +16,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHeader;
 import org.myazure.weixin.constant.MyazureConstants;
 import org.myazure.weixin.constant.WeixinConstans;
 import org.slf4j.Logger;
@@ -34,6 +27,7 @@ import org.springframework.stereotype.Service;
 import weixin.popular.api.ComponentAPI;
 import weixin.popular.api.QrcodeAPI;
 import weixin.popular.api.TicketAPI;
+import weixin.popular.api.UserAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiQueryAuthResult;
 import weixin.popular.bean.component.ApiQueryAuthResult.Authorization_info;
@@ -52,7 +46,6 @@ import weixin.popular.util.SignatureUtil;
 import weixin.popular.util.StreamUtils;
 import weixin.popular.util.XMLConverUtil;
 
-import com.alibaba.fastjson.JSON;
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 
@@ -61,7 +54,6 @@ public class MyazureWeixinAPI {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MyazureWeixinAPI.class);
 
-	protected static Header jsonHeader = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
 
 	@Autowired
 	private   StringRedisTemplate redisTemplate;
@@ -300,9 +292,7 @@ public class MyazureWeixinAPI {
 	 * @return User
 	 */
 	public User userInfo(String access_token, String openid, int emoji) {
-		HttpUriRequest httpUriRequest = RequestBuilder.post().setUri(WeixinConstans.BASE_WEIXIN_API_URI + "/cgi-bin/user/info")
-				.addParameter(WeixinConstans.PARAM_ACCESS_TOKEN, access_token).addParameter("openid", openid).addParameter("lang", "zh_CN").build();
-		User user = LocalHttpClient.executeJsonResult(httpUriRequest, User.class);
+		User user = UserAPI.userInfo(access_token, openid, emoji);
 		if (emoji != 0 && user != null && user.getNickname() != null) {
 			user.setNickname_emoji(EmojiUtil.parse(user.getNickname(), emoji));
 		}
@@ -339,10 +329,8 @@ public class MyazureWeixinAPI {
 	 *            json 数据
 	 * @return QrcodeTicket
 	 */
-	private QrcodeTicket qrcodeCreate(String access_token, String qrcodeJson) {
-		HttpUriRequest httpUriRequest = RequestBuilder.post().setHeader(jsonHeader).setUri(WeixinConstans.BASE_WEIXIN_API_URI + "/cgi-bin/qrcode/create")
-				.addParameter(WeixinConstans.PARAM_ACCESS_TOKEN, access_token).setEntity(new StringEntity(qrcodeJson, Charset.forName("utf-8"))).build();
-		return LocalHttpClient.executeJsonResult(httpUriRequest, QrcodeTicket.class);
+	private QrcodeTicket qrcodeCreate(String access_token, int scene_id) {
+		return QrcodeAPI.qrcodeCreateFinal(access_token, scene_id);
 	}
 
 	/**
@@ -357,9 +345,7 @@ public class MyazureWeixinAPI {
 	 * @return QrcodeTicket
 	 */
 	public QrcodeTicket qrcodeCreateTemp(String access_token, int expire_seconds, long scene_id) {
-		String json = String.format("{\"expire_seconds\": %d, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": %d}}}",
-				expire_seconds, scene_id);
-		return qrcodeCreate(access_token, json);
+		return QrcodeAPI.qrcodeCreateTemp(access_token, expire_seconds, scene_id);
 	}
 
 	/**
@@ -372,9 +358,7 @@ public class MyazureWeixinAPI {
 	 * @return QrcodeTicket
 	 */
 	public QrcodeTicket qrcodeCreateFinal(String access_token, int scene_id) {
-		// TODO
-		String json = String.format("{\"action_name\": \"QR_LIMIT_SCENE\", \"action_info\": {\"scene\": {\"scene_id\":%d}}}", scene_id);
-		return qrcodeCreate(access_token, json);
+		return QrcodeAPI.qrcodeCreateFinal(access_token, scene_id);
 	}
 
 	/**
@@ -387,8 +371,7 @@ public class MyazureWeixinAPI {
 	 * @return QrcodeTicket
 	 */
 	public QrcodeTicket qrcodeCreateFinal(String access_token, String scene_str) {
-		String json = String.format("{\"action_name\": \"QR_LIMIT_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\": \"%s\"}}}", scene_str);
-		return qrcodeCreate(access_token, json);
+		return QrcodeAPI.qrcodeCreateFinal(access_token, scene_str);
 	}
 
 	/**
