@@ -212,6 +212,9 @@ public class AuthorizeHandler {
 		}else {
 			oaUpdate=officialAccountService.findByAppId(eventMessage.getAuthorizerAppid());
 		}
+		ApiGetAuthorizerInfoResult info=ComponentAPI.api_get_authorizer_info(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID, eventMessage.getAuthorizerAppid());
+		oaUpdate.setAlias(info.getAuthorizer_info().getAlias());
+		oaUpdate.setQrcodeUrl(info.getAuthorizer_info().getQrcode_url());
 		oaUpdate.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
 		oaUpdate.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
 		officialAccountService.updateAdOfficialAccount(oaUpdate);
@@ -226,6 +229,9 @@ public class AuthorizeHandler {
 			oaUpdate = new MaOfficialAccount();
 			oaUpdate.setAppId(eventMessage.getAuthorizerAppid());
 		}
+		ApiGetAuthorizerInfoResult info=ComponentAPI.api_get_authorizer_info(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID, eventMessage.getAuthorizerAppid());
+		oaUpdate.setAlias(info.getAuthorizer_info().getAlias());
+		oaUpdate.setQrcodeUrl(info.getAuthorizer_info().getQrcode_url());
 		oaUpdate.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
 		oaUpdate.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
 		// checkAuthorize(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getFunc_info());
@@ -241,6 +247,9 @@ public class AuthorizeHandler {
 			oaAuthorized = new MaOfficialAccount();
 			oaAuthorized.setAppId(eventMessage.getAuthorizerAppid());
 		}
+		ApiGetAuthorizerInfoResult info=ComponentAPI.api_get_authorizer_info(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID, eventMessage.getAuthorizerAppid());
+		oaAuthorized.setAlias(info.getAuthorizer_info().getAlias());
+		oaAuthorized.setQrcodeUrl(info.getAuthorizer_info().getQrcode_url());
 		oaAuthorized.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
 		// TODO
 		oaAuthorized.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());

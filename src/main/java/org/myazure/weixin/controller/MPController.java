@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import weixin.popular.api.ComponentAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult.Authorizer_info;
 import weixin.popular.bean.component.ApiQueryAuthResult;
@@ -79,7 +80,6 @@ public class MPController {
 			outputStreamWrite(response.getOutputStream(), "success");
 			return;
 		}
-
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.debug(eventMessage.getInfoType());
 		switch (eventMessage.getInfoType()) {
@@ -116,7 +116,7 @@ public class MPController {
 	public String authorCallback(HttpSession session, @ModelAttribute("currentUser") CurrentUser currentUser,
 			@RequestParam(value = "auth_code", required = true) String authCode, @RequestParam(value = "expires_in", required = true) Long expires) {
 		Long userId = currentUser.getId();
-		MaUser user = userService.getAdUserById(userId);
+		MaUser user = userService.getMaUserById(userId);
 		ApiQueryAuthResult authInfoRes = myazureWeixinAPI.getAuthInfo(authCode);
 		Authorization_info authInfo = authInfoRes.getAuthorization_info();
 		ApiGetAuthorizerInfoResult userInfo = myazureWeixinAPI.getAuthUserInfo(authInfo.getAuthorizer_appid());
@@ -126,6 +126,8 @@ public class MPController {
 			oaUpdate = new MaOfficialAccount();
 			oaUpdate.setAppId(authInfoRes.getAuthorization_info().getAuthorizer_appid());
 		}
+		oaUpdate.setAlias(userInfo.getAuthorizer_info().getAlias());
+		oaUpdate.setQrcodeUrl(userInfo.getAuthorizer_info().getQrcode_url());
 		oaUpdate.setAuthorized(authInfoRes.isSuccess());
 		oaUpdate.setHeadImgUrl(oaAccount.getHead_img());
 		oaUpdate.setNickName(oaAccount.getNick_name());
@@ -154,6 +156,8 @@ public class MPController {
 	public void acceptMessageAndEvent(@PathVariable("appId") String appId, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// get event message info
 		EventMessage eventMessage = myazureWeixinAPI.getEventMessage(request, response, EventMessage.class);
+		LOG.debug("[YSW Adsense]: eventMessage:"+eventMessage.toString());
+		
 		// response
 		// Event Message is null
 		return;

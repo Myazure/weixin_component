@@ -45,7 +45,7 @@ public class UserController {
     @RequestMapping("/users")
     public ModelAndView getUsersPage() {
         LOGGER.debug("[Myazure Weixin]: Getting users page");
-        List<MaUser> users = (List<MaUser>) userService.getAllAdUsers();
+        List<MaUser> users = (List<MaUser>) userService.getAllMaUsers();
         return new ModelAndView("users", "users", users);
     }
 
@@ -53,7 +53,7 @@ public class UserController {
     @RequestMapping("/user")
     public ModelAndView getUserPage(@RequestParam(value = "id") Long id) {
         LOGGER.debug("[Myazure Weixin]: Getting user page for user={}", id);
-        MaUser user = userService.getAdUserById(id);
+        MaUser user = userService.getMaUserById(id);
         if(user == null) {
             throw new NoSuchElementException(String.format("User=%s not found", id));
         }
@@ -66,7 +66,7 @@ public class UserController {
         LOGGER.debug("[Myazure Weixin]: Getting user create form");
         MaUserEntity form = new MaUserEntity();
         if(null != id) {
-            MaUser user = userService.getAdUserById(id);
+            MaUser user = userService.getMaUserById(id);
             if(null != user) {
             	form.setId(user.getId());
             	form.setUserName(user.getUserName());

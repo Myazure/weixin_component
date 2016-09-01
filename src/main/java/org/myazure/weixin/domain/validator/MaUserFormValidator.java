@@ -39,7 +39,7 @@ public class MaUserFormValidator implements Validator {
     }
 
     private void validateName(Errors errors, MaUserEntity form) {
-        if (userService.getAdUserByName(form.getUserName()) != null) {
+        if (userService.getMaUserByName(form.getUserName()) != null) {
             errors.rejectValue("userName", "userName", "User with this name already exists");
         }
     }
