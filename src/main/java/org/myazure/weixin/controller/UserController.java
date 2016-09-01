@@ -7,7 +7,7 @@ import javax.validation.Valid;
 
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.entity.MaUserEntity;
-import org.myazure.weixin.domain.validator.AdUserFormValidator;
+import org.myazure.weixin.domain.validator.MaUserFormValidator;
 import org.myazure.weixin.service.MaUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +29,10 @@ public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private final MaUserService userService;
-    private final AdUserFormValidator userCreateFormValidator;
+    private final MaUserFormValidator userCreateFormValidator;
     
     @Autowired
-    public UserController(MaUserService userService, AdUserFormValidator userCreateFormValidator) {
+    public UserController(MaUserService userService, MaUserFormValidator userCreateFormValidator) {
         this.userService = userService;
         this.userCreateFormValidator = userCreateFormValidator;
     }
