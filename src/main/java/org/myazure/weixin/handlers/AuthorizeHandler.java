@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Controller;
+
 import weixin.popular.api.ComponentAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiQueryAuthResult;
@@ -22,13 +25,16 @@ import weixin.popular.bean.component.ComponentAccessToken;
 import weixin.popular.bean.component.ComponentReceiveXML;
 import weixin.popular.bean.component.PreAuthCode;
 import weixin.popular.bean.component.ApiQueryAuthResult.Authorization_info;
-
+@Controller
 public class AuthorizeHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuthorizeHandler.class);
 	@Autowired
-	private static MaOfficialAccountService officialAccountService;
-
+	private static   MaOfficialAccountService officialAccountService;
+	@Autowired
+	private static   StringRedisTemplate redisTemplate;
+	@Autowired
+	private MyazureWeixinAPI myazureWeixinAPI;
 	/**
 	 * 获取公众号第三方平台access_token<br />
 	 * YSW_APP_ID 公众号第三方平台appid<br />
@@ -39,14 +45,14 @@ public class AuthorizeHandler {
 	 */
 	public static String getComponentAccessTokenStr() {
 		LOG.debug("[Myazure Weixin]: Get >>>Component Access Token<<< from redis.");
-		String accessToken = MyazureConstants.redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
+		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
 			LOG.info("[Myazure Weixin]: Get >>>Component Access Token<<< from WX.");
 			ComponentAccessToken res = ComponentAPI.api_component_token(MyazureConstants.MYAZURE_APP_ID, MyazureConstants.MYAZURE_APP_SECRET,
 					MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET);
 			accessToken = res.getComponent_access_token();
 			if (null != accessToken) {
-				MyazureConstants.redisTemplate.opsForValue().set(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY, accessToken, res.getExpires_in() - 60,
+				redisTemplate.opsForValue().set(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY, accessToken, res.getExpires_in() - 60,
 						TimeUnit.SECONDS);
 			}
 		}
@@ -79,7 +85,7 @@ public class AuthorizeHandler {
 	public String getPreAuthCodeStr() {
 		// Fetch from redis first
 		LOG.info("[Myazure Weixin]: Get >>>Pre Auth Code<<< from redis.");
-		String preAuthCode = MyazureConstants.redisTemplate.opsForValue().get(WeixinConstans.PRE_AUTH_CODE_KEY);
+		String preAuthCode = redisTemplate.opsForValue().get(WeixinConstans.PRE_AUTH_CODE_KEY);
 		if (null == preAuthCode || preAuthCode.trim().length() == 0) {
 			LOG.info("[Myazure Weixin]: Get >>>Pre Auth Code<<< from WX.");
 			PreAuthCode res = ComponentAPI.api_create_preauthcode(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID);
@@ -87,7 +93,7 @@ public class AuthorizeHandler {
 		}
 		PreAuthCode res2 = ComponentAPI.api_create_preauthcode(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID);
 		if (null != res2.getPre_auth_code()) {
-			MyazureConstants.redisTemplate.opsForValue().set(WeixinConstans.PRE_AUTH_CODE_KEY, res2.getPre_auth_code(), res2.getExpires_in() - 60,
+			redisTemplate.opsForValue().set(WeixinConstans.PRE_AUTH_CODE_KEY, res2.getPre_auth_code(), res2.getExpires_in() - 60,
 					TimeUnit.SECONDS);
 		}
 		return preAuthCode;
@@ -96,13 +102,13 @@ public class AuthorizeHandler {
 	public String getAuthorizerRefreshTokenStr(String authorizer_appid) {
 		String key = genAuthorizerRefreshTokenKey(authorizer_appid);
 		LOG.info("[Myazure Weixin]: Get >>>Authorizer Refresh Token<<< from redis.");
-		String authorizerRefreshToken = MyazureConstants.redisTemplate.opsForValue().get(key);
+		String authorizerRefreshToken = redisTemplate.opsForValue().get(key);
 		if (null == authorizerRefreshToken || authorizerRefreshToken.trim().length() == 0) {
 			LOG.info("[Myazure Weixin]: Get >>>Authorizer Refresh Token<<< from DB.   ID" + authorizer_appid);
 			MaOfficialAccount oa = officialAccountService.findByAppId(authorizer_appid);
 			authorizerRefreshToken = oa.getRefreshToken();
 			if (null != authorizerRefreshToken) {
-				MyazureConstants.redisTemplate.opsForValue().set(key, authorizerRefreshToken);
+				redisTemplate.opsForValue().set(key, authorizerRefreshToken);
 			}
 		}
 		return authorizerRefreshToken;
@@ -125,10 +131,10 @@ public class AuthorizeHandler {
 			if (null != authInfo) {
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Access Token<<< to redis.");
 				String key = genAuthorizerAccessTokenKey(authInfo.getAuthorizer_appid());
-				MyazureConstants.redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
+				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_access_token(), authInfo.getExpires_in() - 60, TimeUnit.SECONDS);
 				LOG.info("[Myazure Weixin]: Store >>>Authorizer Refresh Token<<< to redis.");
 				key = genAuthorizerRefreshTokenKey(authInfo.getAuthorizer_appid());
-				MyazureConstants.redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
+				redisTemplate.opsForValue().set(key, authInfo.getAuthorizer_refresh_token());
 			}
 		}
 		return auth;
@@ -196,22 +202,23 @@ public class AuthorizeHandler {
 		return WeixinConstans.AUTHORIZER_ACCESS_TOKEN_KEY + "[" + authorizerAppId + "]:";
 	}
 
-	public static void unauthorized(ComponentReceiveXML eventMessage) {
+	public   void unauthorized(ComponentReceiveXML eventMessage) {
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.debug("[Myazure Weixin]: updateauthorized:" + eventMessage.getAppId());
-		MaOfficialAccount oaUpdate = officialAccountService.findByAppId(eventMessage.getAuthorizerAppid());
-		if (oaUpdate == null) {
+		MaOfficialAccount oaUpdate;
+		if (officialAccountService.findByAppId(eventMessage.getAuthorizerAppid()) == null) {
 			oaUpdate = new MaOfficialAccount();
 			oaUpdate.setAppId(eventMessage.getAuthorizerAppid());
+		}else {
+			oaUpdate=officialAccountService.findByAppId(eventMessage.getAuthorizerAppid());
 		}
 		oaUpdate.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
-		oaUpdate.setRefreshToken(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
-		// checkAuthorize(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getFunc_info());
+		oaUpdate.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
 		officialAccountService.updateAdOfficialAccount(oaUpdate);
 		return;
 	}
 
-	public static void updateauthorized(ComponentReceiveXML eventMessage) {
+	public   void updateauthorized(ComponentReceiveXML eventMessage) {
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.debug("[YSW Adsense]: updateauthorized:" + eventMessage.getAppId());
 		MaOfficialAccount oaUpdate = officialAccountService.findByAppId(eventMessage.getAuthorizerAppid());
@@ -220,13 +227,13 @@ public class AuthorizeHandler {
 			oaUpdate.setAppId(eventMessage.getAuthorizerAppid());
 		}
 		oaUpdate.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
-		oaUpdate.setRefreshToken(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
+		oaUpdate.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
 		// checkAuthorize(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getFunc_info());
 		officialAccountService.updateAdOfficialAccount(oaUpdate);
 		return;
 	}
 
-	public static void authorized(ComponentReceiveXML eventMessage) {
+	public   void authorized(ComponentReceiveXML eventMessage) {
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.error("[Myazure Weixin]: NOT FOUNDED ! Event Type: ", eventMessage.getInfoType());
 		MaOfficialAccount oaAuthorized = officialAccountService.findByAppId(eventMessage.getAuthorizerAppid());
@@ -236,13 +243,13 @@ public class AuthorizeHandler {
 		}
 		oaAuthorized.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
 		// TODO
-		oaAuthorized.setRefreshToken(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
+		oaAuthorized.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
 		// checkAuthorize(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getFunc_info());
 		officialAccountService.updateAdOfficialAccount(oaAuthorized);
 		return;
 	}
 
-	public static void unknowEvent(ComponentReceiveXML eventMessage) {
+	public   void unknowEvent(ComponentReceiveXML eventMessage) {
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.error("[Myazure Weixin]: NOT FOUNDED ! Event Type: ", eventMessage.getInfoType());
 	}
