@@ -15,6 +15,7 @@ import org.myazure.weixin.domain.MaOfficialAccount;
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.CurrentUser;
 import org.myazure.weixin.handlers.AuthorizeHandler;
+import org.myazure.weixin.processor.MessagePostman;
 import org.myazure.weixin.service.MaOfficialAccountService;
 import org.myazure.weixin.service.MaUserService;
 import org.slf4j.Logger;
@@ -28,14 +29,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import weixin.popular.api.ComponentAPI;
+import weixin.popular.api.TokenAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult.Authorizer_info;
 import weixin.popular.bean.component.ApiQueryAuthResult;
 import weixin.popular.bean.component.ApiQueryAuthResult.Authorization_info;
 import weixin.popular.bean.component.ComponentReceiveXML;
 import weixin.popular.bean.message.EventMessage;
+import weixin.popular.bean.message.message.TextMessage;
 
+import com.alibaba.fastjson.JSON;
 import com.qq.weixin.mp.aes.AesException;
 
 /**
@@ -77,9 +80,10 @@ public class MPController {
 	public void acceptAuthorizeEvent(HttpServletRequest request, HttpServletResponse response) throws IOException, AesException {
 		ComponentReceiveXML eventMessage = myazureWeixinAPI.getEventMessage(request, response, ComponentReceiveXML.class);
 		if (eventMessage == null) {
-			outputStreamWrite(response.getOutputStream(), "success");
+			outputStreamWrite(response.getOutputStream(), "false");
 			return;
 		}
+		outputStreamWrite(response.getOutputStream(), "success");
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
 		LOG.debug(eventMessage.getInfoType());
 		switch (eventMessage.getInfoType()) {
@@ -99,7 +103,6 @@ public class MPController {
 			authorizeHandler.unknowEvent(eventMessage);
 			break;
 		}
-		outputStreamWrite(response.getOutputStream(), "success");
 		return;
 	}
 
@@ -156,11 +159,130 @@ public class MPController {
 	public void acceptMessageAndEvent(@PathVariable("appId") String appId, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// get event message info
 		EventMessage eventMessage = myazureWeixinAPI.getEventMessage(request, response, EventMessage.class);
-		LOG.debug("[YSW Adsense]: eventMessage:"+eventMessage.toString());
-		
-		// response
-		// Event Message is null
+		outputStreamWrite(response.getOutputStream(), "success");
+		response.getOutputStream().flush();
+		if (eventMessage == null) {
+			LOG.error("[MyazureWeixin]: NOT FOUNDED Event Message:" + eventMessage);
+//			TextMessage errMessage = new TextMessage(MyazureConstants.MYAZURE_WEIXIN_ADMIN_OPENID, "[MyazureWeixin]: NOT FOUNDED Event Message:" + eventMessage);
+//			sendAdminMsg(errMessage);
+			return;
+		}
+		LOG.debug("[MyazureWeixin]: eventMessage:" + eventMessage.toString());
+		MaOfficialAccount oaAccount = maOfficialAccountService.findByAppId(appId);
+		if (oaAccount == null) {
+			LOG.debug("[MyazureWeixin]:oaAccount Not Founded,msg:{}", JSON.toJSONString(eventMessage));
+//			TextMessage errMessage = new TextMessage(MyazureConstants.MYAZURE_WEIXIN_ADMIN_OPENID, "OaAccountNotFounded");
+//			sendAdminMsg(errMessage);
+			return;
+		}
+		switch (eventMessage.getMsgType()) {
+		case "event":
+			String eventString = eventMessage.getEvent();
+			switch (eventString) {
+			case "subscribe":
+				LOG.debug("[MyazureWeixin]: VIEW event {}", eventMessage.getEvent());
+				LOG.debug("[MyazureWeixin]: VIEW eventKey {}", eventMessage.getEventKey());
+				LOG.debug("[MyazureWeixin]: VIEW eventMessage {}", JSON.toJSONString(eventMessage));
+				String eventKey = eventMessage.getEventKey();
+				if (eventKey.startsWith("qrscene_")) {
+					// TODO
+					// subscribe event
+					// scan event
+				} else {
+					// TODO
+					// Normal Subscribe
+				}
+				return;
+			case "SCAN":
+				//TODO 
+				//scan things
+				//
+				return;
+			case "unsubscribe":
+				//TODO
+
+				return;
+			case "location":
+				//TODO
+				//save Location
+				return;
+			case "VIEW":
+				LOG.debug("[MyazureWeixin]: VIEW event {}", eventMessage.getEvent());
+				LOG.debug("[MyazureWeixin]: VIEW eventKey {}", eventMessage.getEventKey());
+				LOG.debug("[MyazureWeixin]: VIEW eventMessage {}", JSON.toJSONString(eventMessage));
+				return;
+			case "CLICK":
+				LOG.debug("[MyazureWeixin]: CLICK event {}", eventMessage.getEvent());
+				LOG.debug("[MyazureWeixin]: CLICK eventKey {}", eventMessage.getEventKey());
+				LOG.debug("[MyazureWeixin]: CLICK eventMessage {}", JSON.toJSONString(eventMessage));
+				return;
+			default:
+				LOG.debug("[MyazureWeixin]: Default event {}", eventMessage.getEvent());
+				LOG.debug("[MyazureWeixin]: Default eventKey {}", eventMessage.getEventKey());
+				LOG.debug("[MyazureWeixin]: default eventMessage {}", JSON.toJSONString(eventMessage));
+				break;
+			}
+			break;
+		case "text":
+			LOG.info("[MyazureWeixin]:  text MsgId is {}", eventMessage.getMsgId());
+			LOG.info("[MyazureWeixin]:  text event is {}", eventMessage.getEvent());
+			LOG.debug("[MyazureWeixin]:  text Content is {}", eventMessage.getContent());
+			LOG.debug("[MyazureWeixin]: image eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		case "image":
+			LOG.info("[MyazureWeixin]: image MsgId is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: image PicUrl is {}", eventMessage.getPicUrl());
+			LOG.debug("[MyazureWeixin]: image MediaId is {}", eventMessage.getMediaId());
+			LOG.debug("[MyazureWeixin]: image eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		case "voice":
+			LOG.info("[MyazureWeixin]: voice MsgId is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: voice MediaId is {}", eventMessage.getMediaId());
+			LOG.debug("[MyazureWeixin]: voice Format is {}", eventMessage.getFormat());
+			LOG.debug("[MyazureWeixin]: voice eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		case "video":
+			LOG.info("[MyazureWeixin]: video MsgId is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: video MediaId is {}", eventMessage.getMediaId());
+			LOG.debug("[MyazureWeixin]: video ThumbMedia is {}", eventMessage.getThumbMediaId());
+			LOG.debug("[MyazureWeixin]: video eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		case "shortvideo":
+			LOG.info("[MyazureWeixin]: Dispatch event, event is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: Default event, msgType is {}", eventMessage.getMsgType());
+			LOG.debug("[MyazureWeixin]: Default eventKey {}", eventMessage.getEventKey());
+			LOG.debug("[MyazureWeixin]: Default eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		case "location":
+			LOG.info("[MyazureWeixin]: Dispatch event, event is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: Default event, msgType is {}", eventMessage.getMsgType());
+			LOG.debug("[MyazureWeixin]: Default eventKey {}", eventMessage.getEventKey());
+			LOG.debug("[MyazureWeixin]: Default eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		case "link":
+			LOG.info("[MyazureWeixin]: Dispatch event, event is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: Default event, msgType is {}", eventMessage.getMsgType());
+			LOG.debug("[MyazureWeixin]: Default eventKey {}", eventMessage.getEventKey());
+			LOG.debug("[MyazureWeixin]: Default eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		default:
+			LOG.info("[MyazureWeixin]: Dispatch event, event is {}", eventMessage.getMsgId());
+			LOG.debug("[MyazureWeixin]: Default event, msgType is {}", eventMessage.getMsgType());
+			LOG.info("[MyazureWeixin]: Default event, event is {}", eventMessage.getEvent());
+			LOG.debug("[MyazureWeixin]: Default eventKey {}", eventMessage.getEventKey());
+			LOG.debug("[MyazureWeixin]: Default eventMessage {}", JSON.toJSONString(eventMessage));
+			break;
+		}
+//		TextMessage errMessage = new TextMessage(MyazureConstants.MYAZURE_WEIXIN_ADMIN_OPENID, "[MyazureWeixin]: NOT FOUNDED Event Message:" + eventMessage);
+//		sendAdminMsg(errMessage);
 		return;
+	}
+
+	private void sendAdminMsg(TextMessage msg2Send) {
+		MessagePostman errMsg = new MessagePostman(msg2Send, TokenAPI.token(MyazureConstants.MYAZURE_WEIXIN_ADMIN_APPID,
+				MyazureConstants.MYAZURE_WEIXIN_ADMIN_APPSECRET).getAccess_token());
+		Thread toSendMsg = new Thread(errMsg);
+		toSendMsg.start();
 	}
 
 	private boolean outputStreamWrite(OutputStream outputStream, String text) {
