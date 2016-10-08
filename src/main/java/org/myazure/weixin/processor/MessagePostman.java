@@ -12,6 +12,9 @@ public class MessagePostman implements Runnable {
 	private String appIdString;
 	private Message msg2Send;
 	private BaseResult resaultMsg;
+	private String toUserIdString;
+	private String groupIdString;
+	private String tagIdString;
 	private static final Logger LOG = LoggerFactory.getLogger(MessagePostman.class);
 
 	public MessagePostman() {
@@ -31,6 +34,9 @@ public class MessagePostman implements Runnable {
 
 	@Override
 	public void run() {
+		
+		
+		
 		LOG.debug("[MyazureWeChat]:  StartSendMsg AppID:{},MSG:{}",appIdString,msg2Send);
 		resaultMsg=MessageAPI.messageCustomSend(this.accessTokenString, this.msg2Send);
 		LOG.debug("[MyazureWeChat]:  AppID:{},MSGErrResault:{}",appIdString,resaultMsg.getErrmsg());

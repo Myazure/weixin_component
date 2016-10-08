@@ -29,7 +29,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests()
-				.antMatchers("/css/**", "/img/**", "/test", "/debug", "/event/authorize", "/callback/**", "/iptrigger", "/notify", "/api").permitAll()
+				.antMatchers("/css/**", "/img/**", "/test", "/debug", "/event/authorize", "/callback/**", "/iptrigger", "/notify", "/api", "/public/**", "/private/**").permitAll()
 				.anyRequest().fullyAuthenticated().and().formLogin().loginPage("/login").failureUrl("/login?error").permitAll().and().logout()
 				.deleteCookies("remember-me").permitAll().and().rememberMe();
 	}
