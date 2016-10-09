@@ -209,7 +209,8 @@ public class MassSendController {
 			result.setSuccess(true);
 			response.getOutputStream().print(new String(JSON.toJSONString(result).getBytes(), "ISO-8859-1"));
 			LOG.debug("[MyazureWeixin]: SUCESS MSG:[{}]", result.getMessage());
-			sender = new SendMassMessage(message);
+				LOG.debug("[MyazureWeixin]: Message:[{}]", JSON.toJSONString(message));
+			sender = new SendMassMessage(message,oa);
 			LOG.debug("[MyazureWeixin]: Start Send Processor:[{}]", System.currentTimeMillis());
 			new Thread(sender).start();
 			LOG.debug("[MyazureWeixin]: End Send Processor:[{}]", System.currentTimeMillis());

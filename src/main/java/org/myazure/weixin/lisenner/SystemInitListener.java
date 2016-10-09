@@ -52,7 +52,7 @@ public class SystemInitListener implements ServletContextListener {
 		MyazureConstants.MYAZURE_SERVER_ID = MYAZURE_SERVER_ID;
 		API.defaultMode(API.MODE_POPULAR);
 		MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
-		LocalHttpClient.init(50, 10);
+		LocalHttpClient.init(1000, 100);
 		try {
 			MyazureConstants.MYAZUZRE_WXBIZMSGCRYPT = new WXBizMsgCrypt(MyazureConstants.MYAZURE_ENCODE_TOKEN, MyazureConstants.MYAZURE_ENCODE_KEY,
 					MyazureConstants.MYAZURE_APP_ID);

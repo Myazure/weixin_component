@@ -32,9 +32,9 @@ public class AuthorizeHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuthorizeHandler.class);
 	@Autowired
-	private static   MaOfficialAccountService officialAccountService;
+	private     MaOfficialAccountService officialAccountService;
 	@Autowired
-	private static   StringRedisTemplate redisTemplate;
+	private     StringRedisTemplate redisTemplate;
 	@Autowired
 	private MyazureWeixinAPI myazureWeixinAPI;
 	/**
@@ -45,7 +45,7 @@ public class AuthorizeHandler {
 	 * 
 	 * @return 公众号第三方平台access_token
 	 */
-	public static String getComponentAccessTokenStr() {
+	public   String getComponentAccessTokenStr() {
 		LOG.debug("[Myazure Weixin]: Get >>>Component Access Token<<< from redis.");
 		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {

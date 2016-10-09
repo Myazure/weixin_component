@@ -90,18 +90,14 @@ public class MPController {
 		case "component_verify_ticket":
 			myazureWeixinAPI.refreshVerifyTicket(eventMessage);
 			break;
-		case "unauthorized":
-			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-			
-			
-			
-			authorizeHandler.unauthorized(eventMessage);
+		case "authorized":
+			authorizeHandler.authorized(eventMessage);
 			break;
 		case "updateauthorized":
 			authorizeHandler.updateauthorized(eventMessage);
 			break;
-		case "authorized":
-			authorizeHandler.authorized(eventMessage);
+		case "unauthorized":
+			authorizeHandler.unauthorized(eventMessage);
 			break;
 		default:
 			authorizeHandler.unknowEvent(eventMessage);

@@ -15,9 +15,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.myazure.weixin.constant.MyazureConstants;
-import org.myazure.weixin.constant.WeixinConstans;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +24,7 @@ import org.springframework.stereotype.Service;
 import weixin.popular.api.ComponentAPI;
 import weixin.popular.api.QrcodeAPI;
 import weixin.popular.api.TicketAPI;
+import weixin.popular.api.TokenAPI;
 import weixin.popular.api.UserAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiQueryAuthResult;
@@ -39,12 +37,17 @@ import weixin.popular.bean.component.PreAuthCode;
 import weixin.popular.bean.message.EventMessage;
 import weixin.popular.bean.qrcode.QrcodeTicket;
 import weixin.popular.bean.ticket.Ticket;
+import weixin.popular.bean.token.Token;
 import weixin.popular.bean.user.User;
-import weixin.popular.client.LocalHttpClient;
 import weixin.popular.util.EmojiUtil;
 import weixin.popular.util.SignatureUtil;
 import weixin.popular.util.StreamUtils;
 import weixin.popular.util.XMLConverUtil;
+
+import org.myazure.weixin.constant.MyazureConstants;
+import org.myazure.weixin.constant.WeixinConstans;
+import org.myazure.weixin.domain.MaOfficialAccount;
+import org.myazure.weixin.service.MaOfficialAccountService;
 
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
@@ -58,10 +61,33 @@ public class MyazureWeixinAPI {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MyazureWeixinAPI.class);
 
-
+	public static   String COMPONENT_ACCESS_TOKEN_KEY = "component.access.token"+"."+MyazureConstants.MYAZURE_APP_ID;
+	public static final String PRE_AUTH_CODE_KEY = "pre.auth.code"+"."+MyazureConstants.MYAZURE_APP_ID;
+	public static final String AUTHORIZER_ACCESS_TOKEN_KEY = "authorizer.access.token"+"."+MyazureConstants.MYAZURE_APP_ID;
+	public static final String AUTHORIZER_REFRESH_TOKEN_KEY = "authorizer.refresh.token"+"."+MyazureConstants.MYAZURE_APP_ID;
+	
+	
+	
+	
 	@Autowired
 	private   StringRedisTemplate redisTemplate;
-
+	
+	
+	@Autowired
+	private MaOfficialAccountService officialAccountService;
+	
+	
+	public   String getAdminAcessToken(){
+		Token adminToken = TokenAPI.token("wx86c66f041e334ba4", "dbee2c24cc0dd3c8bb0805de2f4e4606");
+		  adminToken.getAccess_token();
+	return adminToken.getAccess_token();
+}
+	
+	
+	
+	
+	
+	
 	/**
 	 * 获取公众号第三方平台access_token<br />
 	 * YSW_APP_ID 公众号第三方平台appid<br />
@@ -126,6 +152,64 @@ public class MyazureWeixinAPI {
 		return preAuthCode;
 	}
 
+	
+	public   String getAuthorizerAccessTokenStr(String authorizer_appid) {
+		String key = MyazureWeixinAPI.genAuthorizerAccessTokenKey(authorizer_appid);
+		// Fetch from redis first
+		LOG.info("[YSW Adsense]: Get >>>Authorizer Access Token<<< from redis. key:{}",key);
+		redisTemplate.opsForValue().get(key);
+		
+		String authorizerAccessToken = redisTemplate.opsForValue().get(key);
+		if (null == authorizerAccessToken || authorizerAccessToken.trim().length() == 0) {
+			// Get authorizer refresh token
+			String authorizerRefreshToken = this.getAuthorizerRefreshTokenStr(authorizer_appid);
+			LOG.info("[YSW Adsense]: Get >>>Authorizer Access Token<<< from WX.");
+			AuthorizerAccessToken res = this.getAuthToken(authorizer_appid, authorizerRefreshToken);
+			authorizerAccessToken = res.getAuthorizer_access_token();
+			LOG.info("authorizerAccessToken:>>>>>>>>>" + authorizerAccessToken + "<<<<<<<<<<<<<<");
+			this.setAuthorizerRefreshTokenStr(authorizer_appid, res.getAuthorizer_refresh_token());
+			if (null != authorizerAccessToken) {
+				redisTemplate.opsForValue().set(key, authorizerAccessToken, res.getExpires_in() - 60, TimeUnit.SECONDS);
+			}
+		}
+		return authorizerAccessToken;
+	}
+	
+	
+	public void setAuthorizerRefreshTokenStr(String authorizer_appid, String authorizerRefreshToken) {
+
+		// Get authorizer refresh token
+		LOG.info("[YSW Adsense]: Set >>>Authorizer Refresh Token<<< to DB.");
+		MaOfficialAccount oa = officialAccountService.findByAppId(authorizer_appid);
+		if (authorizerRefreshToken == "" | authorizerRefreshToken == null) {
+			return;
+		}
+		oa.setRefreshToken(authorizerRefreshToken);
+		officialAccountService.updateAdOfficialAccount(oa);
+		LOG.info("[YSW Adsense]: Set >>>Authorizer Refresh Token<<< to DB Sucess.");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public String getAuthorizerRefreshTokenStr(String authorizer_appid) {
 		String key = MyazureWeixinAPI.genAuthorizerRefreshTokenKey(authorizer_appid);
 		// Fetch from redis first

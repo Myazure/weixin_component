@@ -16,23 +16,26 @@ import weixin.popular.bean.component.ComponentReceiveXML;
 public class VerifyTicketHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(VerifyTicketHandler.class);
 	@Autowired
-	private static   StringRedisTemplate redisTemplate;
+	private     StringRedisTemplate redisTemplate;
+	
+	@Autowired
+	private     AuthorizeHandler authorizeHandler;
 	
 	/**
 	 * 刷新凭证
 	 * 
 	 * @param eventMessage
 	 */
-	public static void refreshVerifyTicket(ComponentReceiveXML eventMessage) {
+	public   void refreshVerifyTicket(ComponentReceiveXML eventMessage) {
 		// Update component verify ticket in memory
 		MyazureConstants.MYAZURE_COMPONENT_VERIFY_TICKET = eventMessage.getComponentVerifyTicket();
 		// Refresh component access token
 		LOG.info("[Myazure Weixin]: Refresh component access token from redis.");
 		String accessToken = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);
 		if (null == accessToken || accessToken.trim().length() == 0) {
-			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = AuthorizeHandler.getComponentAccessTokenStr();
+			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = authorizeHandler.getComponentAccessTokenStr();
 		} else if (redisTemplate.getExpire(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY) < 1000) {
-			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = AuthorizeHandler.getComponentAccessTokenStr();
+			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = authorizeHandler.getComponentAccessTokenStr();
 		}
 		if (MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN == null) {
 			MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN = redisTemplate.opsForValue().get(WeixinConstans.COMPONENT_ACCESS_TOKEN_KEY);

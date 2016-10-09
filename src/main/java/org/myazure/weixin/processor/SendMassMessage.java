@@ -1,9 +1,14 @@
 package org.myazure.weixin.processor;
 
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
+import org.myazure.weixin.MyazureWeixinAPI;
+import org.myazure.weixin.domain.MaOfficialAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
+
+import weixin.popular.api.MessageAPI;
 import weixin.popular.bean.message.message.ImageMessage;
 import weixin.popular.bean.message.message.Message;
 import weixin.popular.bean.message.message.MusicMessage;
@@ -18,6 +23,10 @@ import weixin.popular.bean.message.message.VoiceMessage;
  */
 public class SendMassMessage implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(SendMassMessage.class);
+	
+	@Autowired
+	private MyazureWeixinAPI myazureWeixinAPI =new MyazureWeixinAPI();
+	
 	private String messageTypeString;
 	private String toUserString;
 	private Message message;
@@ -27,7 +36,7 @@ public class SendMassMessage implements Runnable {
 	private TextMessage textMessage;
 	private VideoMessage videoMessage;
 	private VoiceMessage voiceMessage;
-
+	private MaOfficialAccount oa;
 	// 永久
 	// 图片大小不超过2M，支持bmp/png/jpeg/jpg/gif格式，语音大小不超过5M，长度不超过60秒，支持mp3/wma/wav/amr格式
 	// 临时
@@ -37,13 +46,18 @@ public class SendMassMessage implements Runnable {
 	// 视频（video）：10MB，支持MP4格式
 	// 缩略图（thumb）：64KB，支持JPG格式
 
-	public SendMassMessage(Message message) {
+	public SendMassMessage(Message message,MaOfficialAccount _oa) {
 		if (message == null) {
 			return;
 		}
 		if (message.getTouser() == null) {
 			return;
 		}
+		if (_oa==null) {
+			return;
+		}
+		
+		this.oa=_oa;
 		this.toUserString = message.getTouser();
 		switch (message.getClass().getName()) {
 		case "weixin.popular.bean.message.message.ImageMessage":
@@ -84,20 +98,25 @@ public class SendMassMessage implements Runnable {
 			LOG.error("[MyazureWeixin]: MessageType:[{}],toUserString：[{}],send ERR", messageTypeString, toUserString);
 			return;
 		}
-
 		switch (toUserString) {
 		case "all":
-
+			this.toUserString="oQNg2w5uclIno9ivhPbysDzxM0UI";
 			break;
 		case "group":
-
+			this.toUserString="oQNg2w5uclIno9ivhPbysDzxM0UI";
 			break;
 		case "active":
-
+			this.toUserString="oQNg2w5uclIno9ivhPbysDzxM0UI";
 			break;
 		default:
+			this.toUserString="oQNg2w5uclIno9ivhPbysDzxM0UI";
 			break;
 		}
+		newsMessage.setTouser(toUserString);
+		LOG.debug("[MyazureWeixin]: tosendMessage:[{}]", JSON.toJSONString(this.newsMessage));
+		LOG.debug("[MyazureWeixin]: OA:[{}]", JSON.toJSONString(oa));
+		LOG.debug("[MyazureWeixin]: AppToken:[{}]",  myazureWeixinAPI.getAuthorizerAccessTokenStr("wx4fedca7c05a5bc36"));
+		MessageAPI.messageCustomSend(myazureWeixinAPI.getAuthorizerAccessTokenStr(oa.getAppId()), this.newsMessage);
 		LOG.debug("[MyazureWeixin]: MessageType:[{}],sended", messageTypeString);
 	}
 
