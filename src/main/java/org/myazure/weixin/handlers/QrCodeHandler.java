@@ -6,7 +6,11 @@ import org.myazure.weixin.constant.MyazureConstants;
 
 import weixin.popular.api.QrcodeAPI;
 import weixin.popular.bean.qrcode.QrcodeTicket;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class QrCodeHandler {
 	/**
 	 * 创建 二维码

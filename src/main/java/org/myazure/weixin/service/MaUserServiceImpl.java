@@ -13,7 +13,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 @Service
 public class MaUserServiceImpl implements MaUserService {
 

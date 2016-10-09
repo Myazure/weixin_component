@@ -1,6 +1,10 @@
 package org.myazure.weixin.controller;
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class EventController {
 
 //    private final AdUserService userService;

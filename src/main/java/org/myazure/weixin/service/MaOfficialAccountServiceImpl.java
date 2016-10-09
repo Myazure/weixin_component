@@ -10,7 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 @Service
 @Transactional
 public class MaOfficialAccountServiceImpl implements MaOfficialAccountService{
@@ -34,10 +38,14 @@ public class MaOfficialAccountServiceImpl implements MaOfficialAccountService{
 
 	@Override
 	public MaOfficialAccount findByAppId(String appId) {
-		List<MaOfficialAccount> oaList = repository.findByAppId(appId);
-        if(oaList != null && !oaList.isEmpty()) {
-            return oaList.get(0);
-        }
+		try {
+			List<MaOfficialAccount> oaList = repository.findByAppId(appId);
+			if(oaList != null && !oaList.isEmpty()) {
+				return oaList.get(0);
+			}
+		} catch (Exception e) {
+			 return null;
+		}
         return null;
 	}
 

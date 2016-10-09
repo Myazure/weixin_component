@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 
+import com.alibaba.fastjson.JSON;
+
 import weixin.popular.api.ComponentAPI;
 import weixin.popular.bean.component.ApiGetAuthorizerInfoResult;
 import weixin.popular.bean.component.ApiQueryAuthResult;
@@ -204,9 +206,9 @@ public class AuthorizeHandler {
 
 	public   void unauthorized(ComponentReceiveXML eventMessage) {
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-		LOG.debug("[Myazure Weixin]: updateauthorized:" + eventMessage.getAppId());
-		MaOfficialAccount oaUpdate;
-		if (officialAccountService.findByAppId(eventMessage.getAuthorizerAppid()) == null) {
+		LOG.debug("[Myazure Weixin]: unauthorized:{} , Authorizer:{}",  eventMessage.getAppId(),eventMessage.getAuthorizerAppid());
+		MaOfficialAccount oaUpdate = null;
+		if (null==officialAccountService.findByAppId(eventMessage.getAuthorizerAppid())) {
 			oaUpdate = new MaOfficialAccount();
 			oaUpdate.setAppId(eventMessage.getAuthorizerAppid());
 		}else {
@@ -241,7 +243,8 @@ public class AuthorizeHandler {
 
 	public   void authorized(ComponentReceiveXML eventMessage) {
 		LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
-		LOG.error("[Myazure Weixin]: NOT FOUNDED ! Event Type: ", eventMessage.getInfoType());
+		LOG.error("[Myazure Weixin]:   authorized:{} ", eventMessage.getAuthorizerAppid());
+		LOG.debug("[Myazure Weixin]:  event message:{}", JSON.toJSONString(eventMessage));
 		MaOfficialAccount oaAuthorized = officialAccountService.findByAppId(eventMessage.getAuthorizerAppid());
 		if (oaAuthorized == null) {
 			oaAuthorized = new MaOfficialAccount();
@@ -250,10 +253,23 @@ public class AuthorizeHandler {
 		ApiGetAuthorizerInfoResult info=ComponentAPI.api_get_authorizer_info(MyazureConstants.MYAZURE_COMPONENT_ACCESS_TOKEN, MyazureConstants.MYAZURE_APP_ID, eventMessage.getAuthorizerAppid());
 		oaAuthorized.setAlias(info.getAuthorizer_info().getAlias());
 		oaAuthorized.setQrcodeUrl(info.getAuthorizer_info().getQrcode_url());
+		info.getAuthorization_info().getFunc_info();
+		info.getAuthorization_info().getAppid();
+		info.getAuthorizer_info().getAlias();
+		info.getAuthorizer_info().getBusiness_info();
+		info.getAuthorizer_info().getHead_img();
+		info.getAuthorizer_info().getNick_name();
+		info.getAuthorizer_info().getQrcode_url();
+		info.getAuthorizer_info().getService_type_info();
+		info.getAuthorizer_info().getUser_name();
+		info.getAuthorizer_info().getVerify_type_info();
+		
+		
+		
+		
+		
 		oaAuthorized.setAuthorized(eventMessage.getAuthorizationCode() != null ? true : false);
-		// TODO
 		oaAuthorized.setRefreshToken(myazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getAuthorizer_refresh_token());
-		// checkAuthorize(MyazureWeixinAPI.getAuthInfo(eventMessage.getAuthorizationCode()).getAuthorization_info().getFunc_info());
 		officialAccountService.updateAdOfficialAccount(oaAuthorized);
 		return;
 	}

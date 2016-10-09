@@ -4,7 +4,11 @@ import java.util.Collection;
 
 import org.myazure.weixin.domain.MaUser;
 import org.myazure.weixin.domain.entity.MaUserEntity;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 
 public interface MaUserService {
 

@@ -2,7 +2,11 @@ package org.myazure.weixin.constant;
 
 import weixin.popular.support.ExpireKey;
 import weixin.popular.support.expirekey.DefaultExpireKey;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class WeixinConstans {
 	public static ExpireKey expireKey = new DefaultExpireKey();
 	public static final String BASE_WEIXIN_API_URI = "https://api.weixin.qq.com";

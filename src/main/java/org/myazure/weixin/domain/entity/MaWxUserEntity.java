@@ -2,7 +2,11 @@ package org.myazure.weixin.domain.entity;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class MaWxUserEntity extends weixin.popular.bean.user.User{
 
 	@NotEmpty

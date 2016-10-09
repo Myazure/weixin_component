@@ -5,7 +5,11 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.myazure.weixin.domain.MaRole;
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class MaUserEntity {
 
 	@NotEmpty

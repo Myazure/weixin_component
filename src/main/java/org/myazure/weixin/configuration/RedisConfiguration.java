@@ -19,7 +19,11 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 @Configuration
 @EnableCaching
 public class RedisConfiguration extends CachingConfigurerSupport {

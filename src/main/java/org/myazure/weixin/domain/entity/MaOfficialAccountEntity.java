@@ -1,5 +1,7 @@
 package org.myazure.weixin.domain.entity;
 
+import javax.persistence.Column;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 
@@ -26,7 +28,16 @@ public class MaOfficialAccountEntity {
 
     @NotEmpty
     private String refreshToken;
-
+   
+    
+    
+    
+//    private String service_type_info;
+//    private String verify_type_info;
+//    private String funcscope_category;
+//    private String business_info;
+//    
+    
     public MaOfficialAccountEntity() {
 
     }
@@ -118,4 +129,36 @@ public class MaOfficialAccountEntity {
 	public void setHeadImgUrl(String headImgUrl) {
 		this.headImgUrl = headImgUrl;
 	}
+
+//	public String getService_type_info() {
+//		return service_type_info;
+//	}
+//
+//	public void setService_type_info(String service_type_info) {
+//		this.service_type_info = service_type_info;
+//	}
+//
+//	public String getVerify_type_info() {
+//		return verify_type_info;
+//	}
+//
+//	public void setVerify_type_info(String verify_type_info) {
+//		this.verify_type_info = verify_type_info;
+//	}
+//
+//	public String getFuncscope_category() {
+//		return funcscope_category;
+//	}
+//
+//	public void setFuncscope_category(String funcscope_category) {
+//		this.funcscope_category = funcscope_category;
+//	}
+//
+//	public String getBusiness_info() {
+//		return business_info;
+//	}
+//
+//	public void setBusiness_info(String business_info) {
+//		this.business_info = business_info;
+//	}
 }

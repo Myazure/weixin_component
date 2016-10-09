@@ -39,6 +39,16 @@ public class MassSendReq {
 	@JsonProperty("thumbmediaid")
 	private String thumb_media_id;
 
+	
+	// NEWS Message
+	@JsonProperty("newsurl")
+	private String newsUrl;
+
+	@JsonProperty("thumburl")
+	private String thumbUrl;
+
+	
+	
 	public String getAppid() {
 		return appid;
 	}
@@ -119,12 +129,6 @@ public class MassSendReq {
 		this.thumbUrl = thumbUrl;
 	}
 
-	// NEWS Message
-	@JsonProperty("newsurl")
-	private String newsUrl;
-
-	@JsonProperty("thumburl")
-	private String thumbUrl;
 
 
 

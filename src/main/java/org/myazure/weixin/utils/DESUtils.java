@@ -11,7 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.alibaba.fastjson.JSON;
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class DESUtils {
 
 	@Value("${adsense.DESUtils.DES_KEY}")

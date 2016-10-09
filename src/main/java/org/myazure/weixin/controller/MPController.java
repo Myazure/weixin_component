@@ -91,6 +91,10 @@ public class MPController {
 			myazureWeixinAPI.refreshVerifyTicket(eventMessage);
 			break;
 		case "unauthorized":
+			LOG.debug(MyazureConstants.LOG_SPLIT_LINE);
+			
+			
+			
 			authorizeHandler.unauthorized(eventMessage);
 			break;
 		case "updateauthorized":

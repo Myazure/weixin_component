@@ -5,7 +5,11 @@ import java.util.List;
 import org.myazure.weixin.domain.MaOfficialAccount;
 import org.myazure.weixin.domain.MaUser;
 
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public interface MaOfficialAccountService {
 	 	List<MaOfficialAccount> findByUser(String userName);
 	    

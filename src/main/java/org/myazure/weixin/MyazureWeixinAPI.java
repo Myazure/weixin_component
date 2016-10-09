@@ -48,7 +48,11 @@ import weixin.popular.util.XMLConverUtil;
 
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 @Service
 public class MyazureWeixinAPI {
 

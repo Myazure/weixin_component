@@ -6,7 +6,11 @@ import org.slf4j.LoggerFactory;
 import weixin.popular.api.MessageAPI;
 import weixin.popular.bean.BaseResult;
 import weixin.popular.bean.message.message.Message;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class MessagePostman implements Runnable {
 	private String accessTokenString;
 	private String appIdString;
@@ -15,6 +19,7 @@ public class MessagePostman implements Runnable {
 	private String toUserIdString;
 	private String groupIdString;
 	private String tagIdString;
+	
 	private static final Logger LOG = LoggerFactory.getLogger(MessagePostman.class);
 
 	public MessagePostman() {

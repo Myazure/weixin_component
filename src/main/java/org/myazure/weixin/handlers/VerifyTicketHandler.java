@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import weixin.popular.bean.component.ComponentReceiveXML;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class VerifyTicketHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(VerifyTicketHandler.class);
 	@Autowired

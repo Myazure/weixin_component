@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 /**
  * 
  * @author WangZhen
- *
+ * @version v1.0
  */
 public interface MaOfficialAccountRepository extends PagingAndSortingRepository<MaOfficialAccount, Long> {
 

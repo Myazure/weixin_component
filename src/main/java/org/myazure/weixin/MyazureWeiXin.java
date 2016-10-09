@@ -18,7 +18,11 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration

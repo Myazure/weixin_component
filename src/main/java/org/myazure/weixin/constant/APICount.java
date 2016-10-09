@@ -1,5 +1,9 @@
 package org.myazure.weixin.constant;
-
+/**
+ * 
+ * @author WangZhen
+ *
+ */
 public class APICount {
 
 	public int ACCESS_TOKEN_COUNT = 0;
